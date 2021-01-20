@@ -1,0 +1,343 @@
+		// 모바일 체크가 필요하여 만듬.
+		// 화면 리사이징에 따라서 html class 명이 변경되는데 그부분을 가져와 체크함
+		function isMobile(){
+			var check = false;
+			// pc 환경
+			var name = document.querySelectorAll("html")[0].className;
+			if (name != "isWeb") {
+				check = true;
+			}
+			return check;
+		}
+		// 더보기
+		function displayMore(iDisplayRow, iTotalCnt) {
+			// 기본 Display 갯수 : iDisplayRow
+			// 전체 데이터 갯수 : iTotalCnt
+
+			// 현재 Display 된 Row 갯수
+			var iNowDisplayRow = Number($("#iDisplayRow").text());
+
+			//console.log(iDisplayRow + "," + iTotalCnt + "," + iNowDisplayRow);
+
+			var indexRow = 0;
+			// 현재 Display 된 Row 갯수가 전체 데이터 갯수 보다 작은 경우에만 진행
+			if(iNowDisplayRow < iTotalCnt) {
+				for(i=0; i < iDisplayRow; i++) {
+					// 시작점은 현재 Display 된 마지막 Row 부터
+					indexRow = (iNowDisplayRow + i);
+
+					// 전체갯수만큼 진행되면 그만.
+					if(indexRow >= iTotalCnt) break;
+
+					// 숫자를 자리수에 맞춰 문자포맷으로 변경. pad(10, 4) : 0010
+					var sIndex = pad(indexRow, 4);
+					//console.log(sIndex);
+
+					// 현재 숨겨져 있는 Row를 show 처리한다.
+					$("#rowData_" + sIndex).css("display","");
+					$("#rowBar_" + sIndex).css("display","");
+				}
+
+				// 전체갯수만큼 진행되면 더보기영역을 숨긴다.
+				if(indexRow >= iTotalCnt - 1) {
+					$("#divDisplayMore").hide();
+				} else {
+					$("#iDisplayRow").text(indexRow + 1);
+				}
+			}
+
+		}
+
+		// 숫자를 자리수에 맞춰 문자포맷으로 변경. pad(10, 4) : 0010
+		function pad(n, width) {
+			n = n + '';
+			return n.length >= width ? n : new Array(width - n.length + 1).join('0') + n;
+		}
+
+		/**----------------------------------------------<pre>
+	    Function name : setSelectValue
+	    Description   : selectbox object에 selected 값을 원하는 value값으로 변경한다.
+	    Author        : 김성권
+	    First Write   : 2009-12-28
+	    Parameters    : obj - selectbox object
+	                    val - selected value
+	    Return Value  : Selectbox selected
+	    Remark        : -
+		</pre>----------------------------------------------**/
+		function setSelectValue(obj, val) {
+		    if(obj.nodeName=='SELECT') {
+		        var selectedIdx = 0;
+		        for (var i=0; i<obj.options.length; i++) {
+		            var o = obj.options[i];
+		            if(o.value==val) { selectedIdx=i; break;}
+		        }
+		        obj.selectedIndex = selectedIdx;
+		    }
+		    else
+		    {
+		        for (var i=0; i<obj.length; i++) {
+		            if(obj[i].value==val) {
+		                obj[i].checked=true;
+		                break;
+		            }
+		        }
+		    }
+			if(obj.nodeName=='SELECT') {
+				var selectedIdx = 0;
+				for (var i=0; i<obj.options.length; i++) {
+					var o = obj.options[i];
+					if(o.value==val) {
+						selectedIdx=i;
+						if(val=='command'){
+							//document.getElementById("dateSelDiv").style.display ='none';
+							document.getElementById("calendarDiv").style.display ='';
+						}
+						break;
+					}
+				}
+				obj.selectedIndex = selectedIdx;
+			}
+			else {
+				for (var i=0; i<obj.length; i++) {
+					if(obj[i].value==val) {
+						obj[i].checked=true;
+						break;
+					}
+				}
+
+			}
+		}
+
+		function trim(str){
+			 return str.replace(/^\s*|\s*$/g,"");
+		}
+
+		// 검색창 특수문자 체크로직
+		function containsChars(obj){
+
+			var check = /[0-9]|[a-zA-Z]|[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/;
+			var space = /\s/g;
+
+			var str = obj.searchValue.value;
+			for(var inx = 0; inx < str.length; inx++){
+				if (!check.test(str.charAt(inx)) || space.test(str.charAt(inx))) {
+					if(space.test(str.charAt(inx))) {
+						alert("검색어에 공백이 있습니다.");
+					} else {
+						alert("검색어에 특수문자를 사용할 수 없습니다.");
+					}
+					obj.searchValue.select();
+					return false;
+				}
+			}
+
+			return true;
+
+		}
+
+		// 종목코드 특수문자 체크로직 (종목코드 바로 받도록)
+		function containsCharsStr(str){
+			var check = /[0-9]|[a-zA-Z]|[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/;
+			var space = /\s/g;
+
+			for(var inx = 0; inx < str.length; inx++){
+				if (!check.test(str.charAt(inx)) || space.test(str.charAt(inx))) {
+					if(space.test(str.charAt(inx))) {
+						alert("검색어에 공백이 있습니다.");
+					} else {
+						alert("검색어에 특수문자를 사용할 수 없습니다.");
+					}
+					// obj.searchValue.select();
+					return false;
+				}
+			}
+
+			return true;
+		}
+
+
+		// 전체 검색이 아닐때 value 값 체크
+		function checkSearchValue(obj){
+			var index = obj.searchColumn.selectedIndex;
+			if(obj.searchColumn.options[index].value!='all'){
+				if(obj.searchValue.value==''){
+					alert('검색값을 입력하십시오');
+					obj.searchValue.focus();
+					return;
+				}
+			}
+			doSearch();
+		}
+
+
+		// 로딩바를 보여준다. 해당 함수는 투자자가이드 및 거래방법에서만 사용한다.
+		// gubun : 1. 투자가이드, 2. 투자가이드PC . 거래방법
+		function showProgressbar(gubun){
+
+			if(gubun == undefined) return false;
+
+			/*if(isMobile() || gubun == 2) {*/
+				var pageId = document.querySelectorAll("select.act")[0].value;
+				front.loading.show();
+				location.href = "/trueelw/investGuide/investGuide.jsp?cmd="+pageId;
+			/*}*/
+		}
+
+		// 타이틀 변경 함수 :: 화면 번호를 넘겨주면 해당 텍스트로 변경함
+		function setTitleBar(viewID){
+			// 화면ID , 타이틀TAG, 해당 페이지명 , 숨은 페이지 제목
+			var arrTit = [
+				["10000","한국투자증권 TRUE ELW","메인"],
+				["10100","Top Picks | 지수ELW | TRUE ELW","Top Picks"],
+				["10110","만기별 시세표 | 지수ELW | TRUE ELW","만기별 시세표"],
+				["10200","Top Picks | 주식ELW | TRUE ELW","Top Picks"],
+				["10210","Top Picks | 주식ELW | TRUE ELW","Top Picks"],
+				["10220","기초자산별 시세표 | 주식ELW | TRUE ELW","기초자산별 시세표"],
+				["10240","예상가 테이블 | 주식ELW | TRUE ELW","예상가 테이블"],
+				["10300","호가 | ELW 현재가 | 투자정보 | TRUE ELW","ELW 현재가"],
+				["10310","거래원 | ELW 현재가 | 투자정보 | TRUE ELW","ELW 현재가"],
+				["10320","차트 | ELW 현재가 | 투자정보 | TRUE ELW","ELW 현재가"],
+				["10330","가격 | ELW 현재가 | 투자정보 | TRUE ELW","ELW 현재가"],
+				["10340","구간별이론가 | ELW 현재가 | 투자정보 | TRUE ELW","ELW 현재가"],
+				["10350","시황 | ELW 현재가 | 투자정보 | TRUE ELW","ELW 현재가"],
+				["10360","시황상세 | ELW 현재가 | 투자정보 | TRUE ELW","시황"],
+				["10370","종목검색 레이어 팝업 | TRUE ELW",""],
+				["10380","레이어 팝업 | TRUE ELW",""],
+				["10390","만기종목정보 | 투자정보 | TRUE ELW","만기종목정보"],
+				["10400","ELW의 이해 | 투자가이드 | TRUE ELW","ELW의 이해"],
+				["10401","ELW의 이해 | 투자가이드 | TRUE ELW","ELW의 이해"],
+				["10410","TRUE ELW 스쿨 | 투자가이드 | TRUE ELW","TRUE ELW 스쿨"],
+				["10411","TRUE ELW 스쿨 | 투자가이드 | TRUE ELW","TRUE ELW 스쿨"],
+				["10420","TRUE ELW 스쿨 | 투자가이드 | TRUE ELW","TRUE ELW 스쿨"],
+				["10421","TRUE ELW 스쿨 | 투자가이드 | TRUE ELW","TRUE ELW 스쿨"],
+				["10430","TRUE ELW 스쿨 | 투자가이드 | TRUE ELW","TRUE ELW 스쿨"],
+				["10440","TRUE ELW 스쿨 | 투자가이드 | TRUE ELW","TRUE ELW 스쿨"],
+				["10450","TRUE ELW 스쿨 | 투자가이드 | TRUE ELW","TRUE ELW 스쿨"],
+				["10460","거래방법 | TRUE ELW 투자방법 | 투자가이드 | TRUE ELW","거래방법"],
+				["10461","거래방법 | TRUE ELW 투자방법 | 투자가이드 | TRUE ELW","거래방법"],
+				["10462","거래방법 | TRUE ELW 투자방법 | 투자가이드 | TRUE ELW","거래방법"],
+				["10463","거래방법 | TRUE ELW 투자방법 | 투자가이드 | TRUE ELW","거래방법"],
+				["10470","투자자 유의사항 | TRUE ELW 투자방법 | 투자가이드 | TRUE ELW","투자자유의사항"],
+				["10480","ELW FAQ | TRUE ELW 투자방법 | 투자가이드 | TRUE ELW","ELW FAQ"],
+				["10500","공지사항 | 고객센터 | TRUE ELW","공지사항"],
+				["10510","공지사항 | 고객센터 | TRUE ELW","공지사항"],
+				["10520","공시정보 | 고객센터 | TRUE ELW","공시정보"],
+				["10530","공시정보 | 고객센터 | TRUE ELW","공시정보"]
+			];
+
+			arrTit.forEach(function (item, index, array) {
+				if (item[0] == viewID) {
+					$(document).attr("title",item[1]) // 타이틀 변경
+					$('.mTit').text(item[2]); // 모바일 페이지명 변경
+
+					if (viewID != '10000') {
+						var localWrapHtml = setLocaWrap(item[1], viewID);// LocalWrap 만들기
+						$('.locaWrap').html(localWrapHtml);// LocalWrap 붙이기
+						$('.hTit1').text(item[2]); // PC 페이지명 변경
+					}
+				}
+			});
+		}
+
+		// LocalWrap 만들기
+		function setLocaWrap(item, viewID){
+			var itemArr = item.split('|'); // | 를 기준으로 배열을 만든다.
+			var locaWrapHtml = "";
+			if (itemArr.length > 2){
+				locaWrapHtml = "<div class='inner'>";
+				locaWrapHtml += "<ul><li>홈</li>";
+				var cnt = itemArr.length - 2;  // 마지막 값인 TRUE ELW 를 삭제한다.
+				var endCnt = 0;
+
+				if (viewID.substring(2,3) == '3' && viewID.substring(2,4) != '36'){ // 현재가 화면일경우 2탭스만 보여준다. 36번은 시황뉴스 상세임.
+					endCnt = 1;
+				}
+				for(var i = cnt; i >= endCnt; i--){
+					var tit = itemArr[i].trim();
+					if (i == endCnt){
+						locaWrapHtml += "<li class='on'><span class='blind'>"+tit+"</span>"+tit+"</li>";
+					} else {
+						locaWrapHtml += "<li>"+tit+"</li>";
+					}
+
+					if(i == cnt){
+						$('#bTit').text(tit); // 숨은 페이지 제목
+					}
+				}
+				locaWrapHtml += "</ul></div>";
+			}
+			return locaWrapHtml;
+		}
+
+		// input값에 숫자만 입력
+		function onlyNumberInput(event){
+			// true 일경우 값 세팅 false 경우 값을 세팅하지 않는다.
+			return check_key_number(event);
+		}
+
+		// 숫자 및 아래 사용되는 키를 제외한 값들은 false로 리턴시킴
+		function check_key_number(event)
+		{
+			var evt = event || window.event;
+			var ch = getKeyCode(evt);
+
+			//alert(ch);
+
+			if(
+					(ch > 47 && ch < 59) 		/* up side number keys */
+					|| (ch > 95 && ch < 106) 	/* right side number keys */
+					|| (ch > 34 && ch < 41) 	/* Home, End, Arrows */
+					|| ch === 8 				/* Backspace */
+					|| ch === 9 				/* Tab */
+					|| ch === 46 				/* Del */
+					|| ch === 190 				/* . */
+			) {
+			} else {
+		 		cancelEvent(evt);
+				return false;
+			}
+
+			return true;
+		}
+
+		function cancelEvent(event) {
+			if (event.preventDefault) {
+				event.preventDefault();
+			}
+
+			event.returnValue = false;
+		}
+
+		function getKeyCode (event) {
+			if (event) {
+				var k = event.which || event.keyCode;
+				/*console.log('keyCode: ' + k);*/
+
+				return k;
+			} else {
+				/*console.log('이벤트 객체가 전달되지 않았습니다.');*/
+				return null;
+			}
+		}
+
+		// 더보기 버튼 생성
+		function setPagingMorebutton(totalCount){
+
+			var PagingMore = true;
+			var pagingButton = "";
+
+			var f = document.searchForm;
+
+			var currentCount = parseInt(f.currentPage.value * 10);
+
+			if (currentCount >= totalCount) PagingMore = false;
+
+			if (PagingMore) {
+				$('.moreBtnWrap').show();
+				pagingButton = "<button type='button' class='btnDef defMore'><span><em>더보기</em><em>(<i>"+currentCount+"</i>/"+totalCount+")</em><em class='ico'></em></span></button>";
+			} else {
+				$('.moreBtnWrap').hide();
+			}
+			$('.moreBtnWrap').html(pagingButton);
+		}
+

@@ -1,0 +1,118 @@
+body {
+    line-height: 1px;
+}
+/*
+.type1 {
+    width: 100%;
+}
+*/
+main 레이아웃2
+.kitia-tit {
+    font-size: 28px;
+    font-weight: 500;
+    color: #000;
+    letter-spacing: -0.75px;
+    text-align: center;
+    padding: 70px 0 50px 0;
+}
+.kitia-tit > span{font-size: 300;}
+.kitia-tit > p {font-size: 16.5px; 
+                line-height: 30px; font-weight: 300; letter-spacing: -0.45px;
+}
+@media all and (max-width:1220px;) {
+    h3{padding: 6% 0 5% 0;}
+}
+.business-list {
+    width: 100%;
+/*    max-width: 1535px;*/
+    margin: 0px auto;
+    display: table;
+/*    list-style: none;*/
+    font-size: 13px;
+    color: #666;
+}
+.business-list li{
+    display: table-cell;
+    vertical-align: top;
+    width: 17%;
+    text-align: center;
+    background-color: #fff;
+    border-left: 1px solid #dbdbdb;
+    padding: 45px 0;
+    transition: all 0.3s;
+}
+.business-list li:first-child{
+    border-left: 0;
+}
+.business-list li:hover, .business-list li:focus{
+    background-color: #ececec;
+}
+.business-item{
+    position: relative;
+    padding-top: 133px;
+    margin-bottom: 38px
+}
+.business-item > span{
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+}
+.business-item > span img{
+    max-width: 100%;
+}
+.business-list li a p strong{
+    display: block;
+    font-size: 23px;
+    line-height: 26px;
+    color: #1f1f1f;
+    letter-spacing: -0.85px;
+    margin-bottom: 10px;
+    font-weight: 400;
+}
+.business-list li a p span{
+    display: block; 
+    font-size: 13px;
+    line-height: 26px;
+    color: #767676;
+    
+}
+@media (max-width: 1220px){
+    .business-list li {padding: 3% 0;}
+    .business-item {
+        margin-bottom: 28px;
+        padding-top: 57%;
+    }
+    .business-item > span img{height: 100%;}
+    .business-list li a p {padding: 0 2%;}
+    .business-list li a p strong {
+        letter-spacing: -1px;
+        margin-bottom: 3%;
+        font-size: 21px;
+    }
+}
+
+@media all and (max-width:900px){
+	.business-list{display:block;}
+	.business-list li{display:block; width:100%; border-left:0; border-bottom:1px solid #dbdbdb;}
+	.business-list li:first-child{border-top:1px solid #dbdbdb;}
+	.business-list li > a{display:table; width:94%; padding:0 3%; overflow:hidden;}
+	.business-item, .business-list li a p{display:table-cell;vertical-align:middle;}
+	.business-item{width:30%; margin-bottom:0; padding-top:133px;}
+	.business-list li a p{width:70%;padding:0;text-align:right;}
+	.business-item > span img{height:auto;}
+
+}
+@media(max-width:768px){
+    .business-item > span img {
+        display: block;
+        margin: 0px auto;
+    }
+}
+@media all and (max-width:480px){
+	.business-item{/*padding-top:29.5%;*/padding-top:25%;}
+	.business-item > span img{max-width:85%;}
+	.business-list li a p strong{font-size:18px;}
+	.business-list li a p span{line-height:24px;}
+}

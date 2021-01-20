@@ -1,0 +1,1657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>KITIA</title>
+    
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/css.css">
+    <link rel="stylesheet" href="css/animate.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/slick.css">
+    <link rel="stylesheet" href="css/content.css">
+    
+    <script type="text/javascript" src="js/jquery-3.5.1.min.js"></script>
+    <script src="js/slick.js"></script>
+    <script type="text/javascript" src="js/analytics.js"></script>
+
+    
+    <!-- 구글 애널리틱스 -->
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-162435065-2"></script>
+<script>
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'UA-162435065-2');
+
+</script>
+</head>
+<body>
+<ul class="skipNAvi">
+   <li>
+       <a href="#container"></a>
+   </li>
+    
+</ul>
+<div id="wrap" class="main fixed">
+<!--header-->
+<script>
+	$(function(){
+		var viewId = "10000";
+		$('.sLi a').on('click', function(){	// sLi클래스를 가지고 있는 li 태그 안에 a 링크를 클릭시 로딩이미지를 보여준다.
+			front.allMenu.close();
+			front.loading.show();
+		});	
+		
+		$('.home').on('click', function(){ // 모바일 홈버튼 클릭시
+			location.href = "/";
+		});
+		
+		$('.prev').on('click', function(){ // 모바일 뒤로가기 버튼 클릭시
+			history.back();
+		});		
+		
+		if (viewId.length > 0){
+			setTitleBar(viewId);	
+		}						
+	});
+	
+	
+</script>
+
+<script>
+var front = {
+    st : null,
+    init : function(){
+        front.isMain = ($("#wrap").is(".main")) ? true : false;
+        front.isQuick = ($(".fixQuickWrap").length > 0) ? true : false;
+        front.isTblFix = ($(".tblFix").length > 0) ? true : false;
+        front.isTblGraph = ($(".dataTbl.graph").length > 0) ? true : false;
+
+        front.common.form();
+        front.common.accordion();
+        front.common.toggle();
+        front.common.tab();
+        front.scroll.active();
+
+        (front.isTblGraph) ? front.tblGraph.barAni() : '';
+     },
+    device : {
+        mobileWidth : 1099,
+        currentWidth : function(){
+            return window.innerWidth >= $(document).width() ? window.innerWidth : $(document).width();
+        },
+        isWeb : function(){
+            return this.currentWidth() > this.mobileWidth;
+        },
+        isMob : function(){
+                return this.currentWidth() <= this.mobileWidth;
+        },
+        isTablet : function(){
+                return 768 <= this.currentWidth() && this.currentWidth() < 1100;
+        },
+    },
+    scroll : {
+        active : function(){
+            var $wrap = $("#wrap");
+            front.st = $(window).scrollTop();
+
+            (front.st > 50) ? $wrap.addClass('fixed') : $wrap.removeClass('fixed');
+            (front.isMain) ? front.main.secAct() : '';
+            (front.isQuick && $(window).scrollTop() > 100) ? $(".fixQuickWrap").fadeIn() : $(".fixQuickWrap").fadeOut();
+        },
+    },
+    scrollEvent : {
+        reset: function(){
+            $("#wrap").removeClass("down up");
+        },
+        init : function(){
+            front.scrollEvent.lastScrollTop = 50;
+            front.scrollEvent.delta = 50;
+        },
+        active: function(){
+            var $win = $(window);
+            var $st2 = $win.scrollTop();
+            var $wrap = $("#wrap");
+
+            if(Math.abs(front.scrollEvent.lastScrollTop - $st2) <= front.scrollEvent.delta) return;
+
+            if($st2 > front.scrollEvent.lastScrollTop && front.scrollEvent.lastScrollTop > 30){
+                $wrap.removeClass("up").addClass("down");
+            }else if(front.scrollEvent.lastScrollTop < 30){
+                $wrap.removeClass("down up");
+            }else if($st2 < front.scrollEvent.lastScrollTop && front.scrollEvent.lastScrollTop > 30){
+                $wrap.removeClass("down").addClass("up");
+            }
+
+            front.scrollEvent.lastScrollTop = $st2;
+        },
+    },
+    resize : function(){
+            if(front.isMain && !front.device.isWeb()){
+                var $height = parseInt($(window).height() * 0.9);
+                ($height > 500) ? $(".vbWrap").css("height", $height) : $(".vbWrap").css("height", "");
+            }else{
+                $(".vbWrap").css("height", "");
+            };
+
+            if(front.device.isWeb()){
+                $("html").removeClass("isMob isTablet").addClass("isWeb");
+            }else if(front.device.isTablet()){
+                $("html").removeClass("isWeb").addClass("isMob isTablet");
+            }else if(front.device.isMob()){
+                $("html").removeClass("isWeb isTablet").addClass("isMob");
+            }
+
+    },
+    common : {
+        form : function(){
+            /* input start */
+            $(".intAct .btn.del").on("click", function(){
+                $(this).siblings("input").val('');
+            });
+
+            $(".intAct input").on("focusin", function(){
+                $(this).closest(".intAct").addClass("focus");
+            });
+
+            $(".intAct input").on("keyup", function(){
+                $(this).closest(".intAct").removeClass("focus").addClass("active");
+            });
+
+            $(".intAct").on("focusout", function(){
+                var _val = $(this).find("input").val();
+                (_val.length == 0) ? $(this).closest(".intAct").removeClass("active focus") : '';
+            });
+            /* input end */
+        },
+        accordion : function(){
+            $(".accAct .accLi.open .accCnt").each(function(){
+                $(this).css("display","block");
+            });
+
+            $(document).on("click", ".accAct .accTit", function(){
+                var _ = $(this);
+                var $parent = _.closest(".accLi");
+                var $accLi = _.closest(".accLi").siblings(".accLi");
+
+                if(!$parent.is(".open")) {
+                    $parent.toggleClass("on").siblings(".accLi").removeClass("on open");
+                    _.closest(".accTit").next(".accCnt").slideToggle(function(){
+                        if($(this).closest(".lyCnt").length == 0){
+                            var $titOffsetTop = _.offset().top;
+                            var $hdHeight = $("#header").height();
+                            var $value = parseInt($titOffsetTop - $hdHeight);
+                            $("body,html").stop().animate({scrollTop : $value});
+                        }else{
+                            var $titOffsetTop = parseInt(_.position().top);
+                            var $hdHeight = $(".lyTit").height();
+                            var $value = parseInt($titOffsetTop);
+                            $(".lyCnt").animate({scrollTop : $value});
+                        }
+
+                    });
+                }else{
+                    $parent.removeClass("open").find(".accCnt").slideUp();
+                }
+
+                ($parent.hasClass("on")) ? _.find(".arr .ico").text("닫기").closest(".accLi").siblings(".accLi").find(".arr .ico").text("열기") :_.find(".arr .ico").text("열기");
+
+                $($accLi).each(function(){
+                    var _ = $(this);
+                    (!_.is(".open")) ? _.find(".accCnt").slideUp() : '';
+                });
+            });
+        },
+        tab : function(){
+            $(".tabAct").each(function(){
+                var _ = $(this);
+
+                if(!_.find(".tabMenu .on").is(".tab")) {
+                    var $id = _.find(".on a").attr("data-id");
+                }else{
+                    var $id = _.find(".on").attr("data-id");
+                }
+                $("#" + $id).addClass("dpb").siblings(".tabCnt").removeClass("dpb");
+            });
+
+            $(".tabMenu a").on("click", function(){
+                var _ = $(this);
+                (!_.is(".tab")) ? _.parent().addClass("on").siblings("li").removeClass("on") : _.addClass("on").siblings("a").removeClass("on");
+            });
+
+            $(".tabAct .tabMenu a").on("click", function(){
+                var _ = $(this);
+                var $id = _.attr("data-id");
+                $("#" + $id).addClass("dpb").siblings(".tabCnt").removeClass("dpb");
+            });
+
+            $(".tabAct li a").on("click", function(){
+                var _ = $(this),
+                    $id = _.attr("data-id");
+                $("#" + $id).addClass("dpb").siblings(".tabCnt").removeClass("dpb");
+            });
+        },
+        toggle : function(){
+            $(".toggle .toggBtn").on("click", function(){
+                var _ = $(this);
+                var $toggTit = _.closest(".toggTit");
+
+                if($toggTit.is(".on")){
+                    _.children(".ico").text("열기");
+                    $toggTit.removeClass("on").next(".toggCnt").hide();
+                }else{
+                    _.children(".ico").text("닫기");
+                    $toggTit.addClass("on").next(".toggCnt").show();
+                }
+
+            });
+        },
+    },
+    tblGraph:{
+        mBarInit:function(){
+            $(".dataTbl.graph .bar").css("width","");
+        },
+        mBarWidth:function(){
+            setTimeout(function(){
+                var $arr=[];
+                var $sum =0;
+                var $thName;
+
+                ($(".dataTbl.graph").is(".tblFix")) ? $thName = $(".dataTbl.graph .tblCnt") : $thName=$(".dataTbl.graph");
+
+                $thName.find("thead th").each(function(i){
+                    var $thW = Math.round($(this).outerWidth());
+                    $arr.push($thW);
+                });
+                for (var i=0; i < 5; i++){
+                    $sum += $arr[i];
+                }
+
+                var $arrLen = $arr.length;
+                var $barTxtW = $arr[4];
+
+                $(".dataTbl.graph .bar").css({
+                    "width":$sum,
+                });
+
+            }, 50);
+
+        },
+        barAni:function(){
+            $(".dataTbl.graph .barTxt").each(function(){
+                $(this).removeClass("zero");
+            });
+
+            $(".dataTbl.graph .bar").on("click", function(){
+                $(this).find(".barTxt span").toggle();
+            });
+        },
+    },
+    main : {
+        secAct : function(){
+            var $scrollTop =$(document).scrollTop();
+            var $deviceHeight = $(window).height();
+
+            setTimeout(function(){
+                $('.main .secAct').each(function(i) {
+                    var $offTop = $(this).offset().top;
+                    if($offTop < $deviceHeight){
+                        $(this).addClass("active");
+                    }else{
+                        if (( $offTop - 600) <= $scrollTop) {
+                            $('.secAct').eq(i).addClass('active');
+                        }
+                    }
+                });
+
+            },0);
+        },
+        rollBan : function(target, speed1, speed2){
+            var _ = $(target);
+            var $ul = _.find("ul");
+    		var $elem = _.find("li").eq(0);
+    		var $elemWidth = _.find("li").outerWidth();
+            var $speed = (front.device.isMob()) ? $speed = speed2 : $speed = speed1;
+
+    		$ul.stop().animate({"left" : -$elemWidth}, $speed, "linear", function(){
+    			var $ulPos = Math.abs(_.find("ul").position().left);
+                var $elemWidth2 = _.find("li").outerWidth();
+                var $widthValue = Math.abs($elemWidth - $elemWidth2);
+
+    			if($ulPos = $elemWidth || $ulPos > $elemWidth){
+                    $ul.append($elem);
+
+                    if($elemWidth == $elemWidth2){
+                        $ul.css("left", 0);
+                    }else if($elemWidth < $elemWidth2) {
+                        $ul.css("left", $widthValue);
+                    }else if($elemWidth > $elemWidth2) {
+                        $ul.css("left", -$widthValue);
+                    }
+
+    				front.main.rollBan(target, speed1, speed2);
+    			}
+    		});
+        },
+    },
+    allMenu : {
+        init: function(){
+            var $body = $("body");
+            var $allMenuWrap = $(".allMenuWrap");
+            var $allMenuIn = $(".allMenuWrap .allIn");
+            var $dim = $("#dim");
+
+            $body.removeClass("noScroll").off("touchmove");
+            $allMenuWrap.removeAttr("tabindex, style").removeClass("open");
+            $allMenuIn.removeAttr("tabindex, style");
+            $allMenuWrap.find(".sub, .subUl").removeClass("on").removeAttr("style");
+            $(".allMenuWrap  .gnbMenuWrap, .allMenuWrap  .gnbMenuWrap .mm").removeClass("on");
+            $(".allMenuWrap  .gnbMenuWrap .mm .arr").remove();
+
+            $("#wrap").css("top","");
+        },
+        open : function(){
+            var $body = $("body");
+            var $mm = $(".allMenuWrap .gnbMenuWrap .mm");
+            var $dim = $("#dim");
+            var $scrollTop = $(window).scrollTop();
+
+            $("#wrap").css("top",-$scrollTop);
+
+            $mm.each(function(){
+                var _ = $(this);
+                (_.find(".arr").length == 0 ) ? _.append('<span class="arr"><i class="ico">열기</i></span>') : '';
+            });
+
+            $(".allMenuWrap").show().addClass("open");
+            $(".allMenuWrap .allIn").attr("tabindex",0).focus();
+            ($dim.length == 0) ? $("body").append("<div id='dim'></div>").find("#dim").fadeIn() : $dim.fadeIn(100);
+            $body.addClass("noScroll").on("touchmove", function(e){
+                e.preventDefault();
+            });
+
+            $(".allMenuWrap .subUl").each(function(){
+                $(this).prev(".sm").addClass("type2");
+            });
+
+            $(".allMenuWrap .allBg").on("click", function(){
+                front.allMenu.close();
+            });
+        },
+        close : function(){
+            var $body = $("body");
+            var $allMenuWrap = $(".allMenuWrap");
+            var $dim = $("#dim");
+
+            $allMenuWrap.removeClass("open on");
+            $("#header .btnNavi.menu").focus();
+            $dim.fadeOut(400, function(){$dim.remove();});
+            $body.removeClass("noScroll").off("touchmove");
+            $(".allMenuWrap .gnbMenuWrap .mm, .allMenuWrap .gnbMenuWrap .sub , .allMenuWrap .gnbMenuWrap .subUl").removeClass("on").removeAttr("style");
+            $(".allMenuWrap .gnbMenuWrap .mm .arr .ico").text("열기");
+
+            var $scrollTop = parseInt($("#wrap").css("top"))*-1;
+            $("#wrap").css("top","");
+            $(window).scrollTop($scrollTop);
+        }
+    },
+    gnbMenu : {
+        open : function(){
+            var $body = $("body");
+            var $allMenuWrap = $(".allMenuWrap");
+
+            ($("#header #dim").length == 0) ? $("#header").append("<div id='dim'></div>").find("#dim").fadeIn(300) : $("#dim").fadeIn(300);
+            $("#header .gnbMenuWrap .sub").stop().slideDown(300);
+        },
+        close : function(){
+            var $body = $("body");
+            var $dim = $("#header #dim");
+            var $allMenuWrap = $(".allMenuWrap");
+
+            $("#header, .gnbMenuWrap, .gnbMenuWrap .mm").removeClass("on");
+            $("#header .gnbMenuWrap .sub").stop().slideUp(300, function(){
+                $(this).removeAttr("style");
+            });
+
+            $dim.fadeOut(300);
+        },
+    },
+    layer : {
+        open : function(id, add){
+            var $body = $("body");
+            var $layerWrap = $(".layerWrap");
+            var $layerId = $(id);
+            var $layerCnt = $layerId.html();
+            var $layerPop = '<div class="layerWrap">'+
+                            '<div class="row">'+
+                            '<div class="col">'+ $layerCnt +
+                            '</div>'+
+                            '</div>'+
+                            '</div>';
+
+            var $scrollTop = $(window).scrollTop();
+
+            (front.device.isMob()) ? $("#wrap").css("top",-$scrollTop) : "";
+            $(window).on("resize", function(){
+                (front.device.isWeb()) ? $("#wrap").css("top",""): "";
+            });
+
+            front.layer.layId = $(id);
+
+            ($layerWrap.length == 0) ? front.layer.lastFoucs = $body.find(":focus") : '';
+
+            $layerWrap.hide().remove();
+            $body.addClass("noScroll").on("touchmove", function(e){
+                e.preventDefault();
+            }).append($layerPop).find(".layerIn").attr("tabindex","0").focus();
+
+            $layerId.find(".layerIn").remove();
+
+            ($(".layerWrap .layerIn").is(".type1")) ? $(".layerWrap").closest(".layerWrap").addClass("type1") : '';
+
+            //($body.find("#dim").length == 0) ? $body.append('<div id="dim"></div>') : '';
+            $body.append('<div id="dim"></div>');
+            front.layer.id = $body.find(":focus").closest(".layerWrap");
+
+            $(".ly-close").on("click", function(){
+                front.layer.close();
+            });
+
+            add = typeof add !== 'undefined' ? add() : '' ;
+
+            //select again active
+            if($(".layerWrap .select").length > 0){
+                $(".layerWrap .select-list-box").remove();
+                $(".layerWrap .select").sSelect();
+            }
+        },
+        close : function(func){
+            var $body = $("body");
+            var $len = $(".layerWrap").length;
+            var $value = front.layer.id.find(".col").html();
+
+            front.layer.id.hide().remove();
+            front.layer.lastFoucs.focus();
+            front.layer.layId.html($value);
+            $body.removeClass("noScroll").off("touchmove").find("#dim").hide().remove();
+            ($body.find("#dim").length == 0) ? '' : $("#dim").hide().remove();
+
+            func = typeof func !== 'undefined' ? func() : '' ;
+
+            var $scrollTop = parseInt($("#wrap").css("top"))*-1;
+            $("#wrap").css("top","");
+            (front.device.isMob()) ?  $(window).scrollTop($scrollTop) : "";
+        },
+    },
+    tblFixed : {
+        reset : function(){
+            $(".tblFix .tblHd").remove();
+        },
+        active: function(){
+            $(".tblFix").each(function(){
+                var _ = $(this);
+                var $tblHd = _.find(".tblHd");
+                var $offsetTop = _.offset().top;
+                var $gnbHeight = $("#header").outerHeight();
+                var $trLen = _.find(".tblCnt thead tr").length;
+                var $tblHdHtml = '<div class="tblHd">' +
+                    '<div class="in">'+
+                        '<table>'+
+                            '<thead>'+
+                                _.find(".tblCnt thead").html(); +
+                            '</thead>'+
+                            '</table>'+
+                    '</div>';
+
+                (_.find(".tblHd").length == 0) ? _.prepend($tblHdHtml) :'';
+                ($trLen > 1) ? _.find(".tblHd").addClass("tr" + $trLen) : '';
+
+                setTimeout(function(){
+                    var $width = _.find(".tblCnt").outerWidth();
+                    _.find(".tblHd table").css("width", $width);
+
+                    _.find(".tblCnt th").each(function(i){
+                        var $th = $(this);
+                        var $len = _.find(".tblCnt th").length;
+
+                        if((i+1) == 1){
+                            var $widthTh = $th.innerWidth();
+                            _.find(".tblHd th").eq(i).css("width", $widthTh);
+                        }else if($len >= (i + 1)){
+                            var $widthTh = $th.innerWidth();
+                            _.find(".tblHd th").eq(i).css("width", $widthTh + 1);
+                        }
+                    });
+                },100);
+
+                if($(window).scrollTop() > $offsetTop) {
+                    $tblHd.show();
+                } else {
+                    $tblHd.hide();
+                }
+
+                _.scroll(function(){
+                    var scrollLeft = _.scrollLeft();
+                    _.find(".tblHd .in").css("left",-scrollLeft);
+                });
+
+            });
+        },
+    },
+    loading : {
+        init:function(){
+            var $load = '<div class="loading">'+
+                    	'<div class="loadIm"><span class="blind">로딩중</span></div>'+
+                    	'</div>';
+
+            ($(".loading").length == 0) ? $("body").append($load) : '';
+        },
+        show:function(){
+            $(".loading").show();
+        },
+        hide:function(){
+            $(".loading").hide();
+        },
+    },
+};
+
+
+$(function(){
+    //select start
+    $.fn.sSelect = function(options){
+		var numberId = Math.floor(Math.random()*10000+1);
+
+		return this.each(function(i){
+            var $wd;
+            var $isWd = $(this).get(0).style.width;
+
+            if($isWd === ""){
+                $wd = 100 +"%";
+            }else{
+                $wd = $isWd;
+            }
+            var $selectedVal = $(this).find("option:selected").text();
+            var $initTxt = (!$(this).find("option:selected")) ? '선택' : $selectedVal;
+			var defaults = {
+					defaultText : $initTxt,
+					listWidth : $wd,
+					animationSpeed : 0,
+					listMaxHeight : '325',
+					containerClass : '',
+					containerOnClass : 'select-list-on',
+					disabled : ($(this).is(":disabled")) ? true : false,
+					id : 'div' + numberId,
+					response : false
+			};
+
+			var opts = $.extend(defaults, options),
+			$input = $(this),
+			$containerDivText = $('<div class="selected-headline"></div>'),
+			$containerDiv = $('<div class="select-list-box ' + opts.containerClass + '" id="' + opts.id + '"></div>'),
+			$newUl = $('<ul class="select-list" style="visibility:hidden;"></ul>'),
+			itemIndex = -1,
+			currentIndex = -1,
+			keys = [],
+			prevKey = false,
+			prevented = false,
+			$newLi;
+
+			$(this).data('ssOpts', options);
+
+            if($input.attr("disabled") == undefined){
+                $containerDiv.insertAfter($input);
+    			$containerDiv.attr('tabindex', $input.attr("tabindex") || "0");
+                $containerDiv.css("width", opts.listWidth);
+    			$containerDivText.prependTo($containerDiv);
+    			$newUl.appendTo($containerDiv);
+    			$input.hide().addClass("act");
+            }
+
+			$containerDivText.data('ssReRender', !$containerDivText.is(':visible'));
+            $input.children().each(function(i){
+                var option = $(this).html();
+                var key = $(this).val();
+
+                keys.push(option.charAt(0).toLowerCase());
+                if($(this).attr('data-selected') == "true"){
+                    opts.defaultText = option;
+                    currentIndex = i;
+                    $containerDiv.addClass('selected-list-box');
+                }
+                $newUl.append($('<li><a href="#none">' + option + '</a></li>').data('key', key));
+            });
+            $newLi = $newUl.children().children();
+
+			var newUlHeight = $newUl.outerHeight(),
+			containerHeight = $containerDiv.outerHeight(),
+			newLiLength = $newLi.length;
+
+			if(currentIndex != -1){
+				navigateList(currentIndex, true);
+			}else{
+				$containerDivText.html(opts.defaultText);
+			}
+
+			function newUlPos(){
+                var $select = $(".select");
+                var $selectBox = $(".select-list-box");
+
+                if(front.device.isWeb() && $selectBox.length > 0) {
+                    $selectBox.show();
+                    var $selectedTxt= $input.find("option:selected").text();
+                    var newUlHeight = $newUl.outerHeight();
+                    var containerHeight = $containerDiv.outerHeight();
+                    $input.next(".select-list-box").find(".selected-headline").html($selectedTxt);
+                    ($input.is(":disabled")) ? $input.show() : $input.hide();
+                }else if(front.device.isMob()){
+                    $selectBox.hide();
+                    $select.show();
+                }
+
+				var containerPosY = $containerDiv.offset().top;
+				var docHeight = jQuery(window).height();
+				var scrollTop = jQuery(window).scrollTop();
+
+				if(newUlHeight > parseInt(opts.listMaxHeight)){
+					newUlHeight = parseInt(opts.listMaxHeight);
+				}
+
+				containerPosY = containerPosY-scrollTop;
+				if(containerPosY + newUlHeight >= docHeight){
+                    $newUl.css({
+                        bottom : containerHeight+'px',
+                        height : newUlHeight
+                    });
+
+					$input.onTop = true;
+				}else{
+                    $newUl.css({
+                        top : containerHeight-1+'px',
+                        height : newUlHeight
+                    });
+
+					$input.onTop = false;
+				}
+			}
+
+			newUlPos();
+
+            $(window).on('resize.sSelect scroll.sSelect', newUlPos);
+
+			function positionFix(){
+				$containerDiv.css('position', 'relative');
+			}
+			function positionHideFix(){
+			    //$containerDiv.css('position', 'static');
+			}
+
+            $containerDivText.on('click.sSelect', function(event){
+				if(opts.disabled){
+					return false;
+				}else{
+					event.stopPropagation();
+
+					if($(this).data('ssReRender')){
+						newUlHeight = $newUl.innerHeight();
+						containerHeight = $containerDiv.innerHeight();
+						$(this).data('ssReRender', false);
+						newUlPos();
+					}
+
+					$('.select-list').not($(this).next()).hide()
+						.parent().removeClass('select-list-focus select-list-on');
+
+					$newUl.toggle();
+					positionFix();
+					try{
+						if(currentIndex == -1){
+							$newLi.eq(0).focus();
+						}else{
+							$newLi.eq(currentIndex).focus();
+						}
+					}catch (ex){
+
+					}
+					if($newUl.is(":hidden")){
+						$containerDiv.removeClass(opts.containerOnClass);
+					}else{
+						$containerDiv.addClass(opts.containerOnClass);
+					}
+				}
+			});
+
+			$newLi.on('click.sSelect', function(e){
+				var $clickedLi = $(e.target);
+				currentIndex = $newLi.index($clickedLi);
+				prevented = true;
+				navigateList(currentIndex);
+				$newUl.hide();
+				$containerDiv.removeClass(opts.containerOnClass);
+			});
+
+			$newLi.on('mouseenter.sSelect', function(e){
+				var $hoveredLi = $(e.target);
+				$hoveredLi.addClass('select-list-hover');
+			}).on('mouseleave.sSelect', $newLi, function(e){
+				var $hoveredLi = $(e.target);
+				$hoveredLi.removeClass('select-list-hover');
+			});
+
+			function navigateList(currentIndex, init){
+				$containerDiv.addClass('selected-list-box');
+				$newLi.removeClass('select-list-selected').eq(currentIndex).addClass('select-list-selected');
+				if($newUl.is(':visible')){
+					try{
+						if(currentIndex == -1){
+							$newLi.eq(0).focus();
+						}else{
+							$newLi.eq(currentIndex).focus();
+						}
+					}catch (ex){
+
+					}
+
+				}
+
+				var text = $newLi.eq(currentIndex).html();
+				var val = $newLi.eq(currentIndex).parent().data('key');
+				if(init == true){
+					$input.val(val);
+					$containerDivText.html(text);
+					return false;
+				}
+
+				try{
+					$input.val(val);
+				}catch(ex){
+					$input[0].selectedIndex = currentIndex;
+				}
+
+				$input.change();
+				$containerDivText.html(text);
+			}
+
+			$input.on('change.sSelect', function(event){
+				$targetInput = $(event.target);
+				if(prevented == true){
+					prevented == false;
+					return false;
+				}
+				$currentOpt = $targetInput.find(':selected');
+				currentIndex = $targetInput.find('option').index($currentOpt);
+				navigateList(currentIndex, true);
+
+			});
+
+
+            function keyPress(element){
+				$(element).unbind('keydown.sSelect').bind('keydown.sSelect', function(e){
+					var keycode = e.which;
+					prevented = true;
+					switch(keycode){
+                        case 9 :
+                            $(this).blur();
+                            break;
+						case 40 :
+						case 39 :
+							incrementList();
+							return false;
+							break;
+						case 38 :
+						case 37 :
+							decrementList();
+							return false;
+							break;
+						case 33 :
+						case 36 :
+							gotoFirst();
+							return false;
+							break;
+						case 34 :
+						case 35 :
+							gotoLast();
+							return false;
+							break;
+						case 13 :
+						case 27 :
+							$newUl.hide();
+							$containerDiv.removeClass(opts.containerOnClass);
+							positionHideFix();
+							return false;
+							break;
+					}
+
+					keyPressed = String.fromCharCode(keycode).toLowerCase();
+
+					var currentKeyIndex = keys.indexOf(keyPressed);
+
+					if(typeof currentKeyIndex != 'undefined'){
+						++currentIndex;
+						currentIndex = keys.indexOf(keyPressed, currentIndex);
+						if(currentIndex == -1 || currentIndex == null || prevKey != keyPressed){
+							currentIndex = keys.indexOf(keyPressed);
+						}
+
+						navigateList(currentIndex);
+						prevKey = keyPressed;
+						return false;
+					}
+				});
+			}
+
+			function incrementList(){
+				if(currentIndex < (newLiLength-1)){
+					++currentIndex;
+					navigateList(currentIndex);
+				}
+			}
+
+			function decrementList(){
+				if(currentIndex > 0){
+					--currentIndex;
+					navigateList(currentIndex);
+				}
+			}
+
+			function gotoFirst(){
+				currentIndex = 0;
+				navigateList(currentIndex);
+			}
+
+			function gotoLast(){
+				currentIndex = newLiLength-1;
+				navigateList(currentIndex);
+			}
+
+			$containerDiv.on('click.sSelect', function(e){
+				e.stopPropagation();
+				keyPress(this);
+			});
+
+			$containerDiv.on('focus.sSelect', function(e){
+				$(this).addClass('select-list-focus');
+				keyPress(this);
+			});
+
+			$containerDiv.on('blur.sSelect', function(e){
+				$(this).removeClass('select-list-focus');
+			});
+
+			$(document).on('click.sSelect', function(){
+				$containerDiv.removeClass('select-list-focus');
+				$newUl.hide();
+				$containerDiv.removeClass(opts.containerOnClass);
+				positionHideFix();
+			});
+
+			$containerDivText.on('mouseenter.sSelect', function(e){
+				var $hoveredTxt = $(e.target);
+				$hoveredTxt.parent().addClass('select-list-hover');
+			}).bind('mouseleave.sSelect', function(e){
+				var $hoveredTxt = $(e.target);
+				$hoveredTxt.parent().removeClass('select-list-hover');
+			});
+
+			$newUl.css({
+				left: '0',
+				display : 'none',
+				visibility : 'visible'
+			});
+		});
+	};
+    // select end
+
+    /* ***** layout ***** */
+    front.init();
+
+    var $document = $(document);
+
+    /* gnbMenu */
+    $document.on("mouseenter focusin", ".gnbMenuWrap .mm", function(){
+        if(front.device.isWeb()){
+            $("#header, #header .gnbMenuWrap").addClass("on");
+            $(this).addClass("on").closest(".li").siblings(".li").find(".mm").removeClass("on");
+            front.gnbMenu.open();
+        }
+    });
+
+    $document.on("focusout", "#header .gnbMenuWrap .li:last-child .sLi:last-child", function(e){
+        if(front.device.isWeb()){
+            (front.device.isWeb()) ? front.gnbMenu.close() : '';
+        }
+    });
+
+    $document.on("mouseleave", "#header .gnbMenuWrap", function(){
+        (front.device.isWeb()) ? front.gnbMenu.close() : '';
+    });
+
+    $document.on("mouseover", "#header #dim", function(){
+        (front.device.isWeb()) ? front.gnbMenu.close() : '';
+    });
+
+    $document.on("click", ".allMenuWrap .mm", function(e){
+        if(front.device.isMob()){
+            var _ = $(this);
+            var $siblings = _.closest(".li").siblings(".li");
+
+            if(!_.is(".on")){
+                _.find(".arr .ico").text("닫기");
+                _.addClass("on").next(".sub").slideDown("fast").addClass("on");
+                $siblings.find(".mm").removeClass("on").find(".arr .ic4o").text("열기");
+                $siblings.find(".sub").slideUp("fast").removeClass("on");
+
+            }else{
+                _.find(".arr .ico").text("열기");
+                _.removeClass("on").next(".sub").slideUp("fast").removeClass("on");
+            }
+
+            e.preventDefault();
+        }
+    });
+
+    $document.on("click", ".allMenuWrap .btnNavi.close", function(){
+        if(front.device.isWeb()){
+            front.gnbMenu.close();
+            $(".gnbMenuWrap li:last-child .mm").focus();
+        }else if(front.device.isMob()){
+            front.allMenu.close();
+        }
+    });
+
+    /* mobile */
+    $document.on("click", "#header .btnNavi.menu", function(){
+        front.allMenu.open();
+    });
+
+
+
+	/* ***** common ***** */
+	$document.on("click", "a[href='#'], a[href='#none']", function(e){e.preventDefault();});
+
+    /* quickTop */
+    $(".btn.quickTop").on("click", function(){
+       $(window).scrollTop(0);
+    });
+
+    /* button */
+    $(".btnDef").on("keyup", function(e){
+        if(e.keyCode == 9 && $(this).focus()){
+            $(this).addClass("focus");
+        }
+    }).on("blur",function(){
+        $(this).removeClass("focus");
+    });
+
+
+
+    /* ***** content ***** */
+    /* 투자가이드 : 앵커메뉴 */
+    $(".anchorAct a").on("click", function(){
+        var _ = $(this);
+        var $id = $("#" +_.attr("data-id"));
+        var $top = parseInt($id.offset().top);
+        var $hdH = $("#header").height();
+        var $val = (front.device.isMob) ? $top - $hdH -10 : $top - $hdH - 20;
+
+        $(window).scrollTop($val);
+    });
+
+    /* window scrolling */
+    $(window).on("scroll", function() {
+       front.scroll.active();
+
+       (front.device.isWeb()) ? front.tblFixed.reset() : front.tblFixed.active();
+       (front.device.isMob()) ? front.scrollEvent.active() : front.scrollEvent.reset();
+    });
+
+
+    /* window resize */
+    $(window).on("resize", function() {
+        front.resize();
+
+        if(front.isTblFix == true){
+            (front.device.isMob()) ? front.tblFixed.active() : front.tblFixed.reset();
+        };
+
+        if(front.device.isWeb()) {
+            front.allMenu.init();
+            ($(".layerWrap").length == 0) ? $("#dim").remove() : '';
+        }
+
+        //select active
+        if($(".select-list-box").length == 0) {
+            $(".select").sSelect();
+        };
+
+        (front.isTblGraph) ?  front.tblGraph.mBarWidth() : '';
+
+    }).trigger("resize");
+
+    //state minus del
+    if($(".statePt").length > 0){
+        statePtMinus();
+    }
+
+	//jquery end
+});
+
+
+/* main visual banner */
+function mainVbAni(){
+	var vbSlider = $('.vbSlider');
+	vbSlider.slick({
+		arrows:true,
+		autoplay:true,
+		infinite: true,
+		dots:true,
+		fade: false,
+		slidesToShow: 1,
+	});
+
+	var $autoValue = vbSlider.slick("slickGetOption","autoplay");
+
+	($autoValue == true) ? $('.vbWrap .slick-controls .btn.stop').addClass("on") : $('.vbWrap .slick-controls').remove();
+
+	$('.vbWrap .slick-controls .btn').on("click",function(){
+		var _ = $(this);
+		_.removeClass("on").siblings(".btn").addClass("on").focus();
+		(_.is(".play")) ? vbSlider.slick("slickPlay") : vbSlider.slick("slickPause");
+	});
+
+	$('.vbWrap .slick-dots button').on("click",function(){
+		vbSlider.slick("slickPause");
+		$('.vbWrap .slick-controls .btn.play').addClass("on").siblings(".btn").removeClass("on");
+	});
+}
+
+/* main rolling banner */
+function mainRollAni(){
+    front.main.rollBan(".rollBan1", 4500, 5500);
+    front.main.rollBan(".rollBan2", 3500, 4500);
+}
+
+
+/* state minus del */
+function statePtMinus(){
+    $(".statePt.down").each(function(){
+        var $str = $(this).find("em").text();
+        $str = $str.replace(/\-/g,'');
+        return $(this).find("em").text($str);
+    });
+    
+
+}
+
+    
+</script>
+
+
+<!--header영역        -->
+       <header id="header">
+           <div class="inner">
+               <div class="row">
+                   <div class="col col1">
+                       <h1 class="logo">
+                           <a href="#" class="ico">kitia</a>
+                           <button type="button" class="btnNavi prev">
+                               <span class="ico">이전</span>
+                           </button>
+                       </h1>
+                   </div>
+                   <div id="mTit" class="col col2">
+                       <h2 class="mTit"></h2>
+                   </div>
+                   <div class="col col3">
+<!--                      gnb메뉴-->
+                      
+                       <div class="gnbMenuWrap">
+                           <ul>
+                               <li class="li">
+                                   <a href="#" class="mm">
+                                       <span>회사소개</span>
+                                       <em class="line"></em>
+                                   </a>
+                                   <ul class="sub" style="display: block; height: 285px; padding-top: 24px; margin-top:1px; margin-bottom: 0px; overflow: hidden;">
+                                       <li class="sLi">
+                                           <a href="#" class="sm">인사말</a>
+                                       </li>
+                                       <li class="sLi">
+                                           <a href="#" class="sm">협의회소개</a>
+                                       </li>
+                                       <li class="sLi">
+                                           <a href="#" class="sm">연혁</a>
+                                       </li>
+                                       <li class="sLi">
+                                           <a href="#" class="sm">찾아오시는길</a>
+                                       </li>
+                                   </ul>
+                               </li>
+                               <li class="li">
+                                   <a href="#" class="mm">
+                                       <span>사업소개</span>
+                                       <em class="line"></em>
+                                   </a>
+                                   <ul class="sub" style="display: block; height: 285px; padding-top: 24px; margin-top:1px; margin-bottom: 0px; overflow: hidden;">
+                                       <li class="sLi">
+                                           <a href="#" class="sm">투자연계형R&D</a>
+                                       </li>
+                                       <li class="sLi">
+                                           <a href="#" class="sm">투자유치지원사업</a>
+                                       </li>
+                                       <li class="sLi">
+                                           <a href="#" class="sm" >투자연계형<br>기술확보지원사업</a>
+                                       </li>
+                                       <li class="sLi">
+                                           <a href="#" class="sm" >소재부품글로벌투<br>자연계기술개발사업</a>
+                                       </li>
+                                       <li class="sLi">
+                                           <a href="#" class="sm" >소재부품글로벌<br>투자협력사업</a>
+                                       </li>
+                                       <li class="sLi">
+                                           <a href="#" class="sm">소재부품전문투자조합</a>
+                                       </li>
+                                   </ul>
+                               </li>
+                               <li class="li">
+                                   <a href="#" class="mm">
+                                       <span>회원사</span>
+                                       <em class="line"></em>
+                                   </a>
+                                   <ul class="sub" style="display: block; height: 285px; padding-top: 24px; margin-top:1px; margin-bottom: 0px; overflow: hidden;">
+                                       <li class="sLi">
+                                           <a href="#" class="sm">회원사 가입안내</a>
+                                       </li>
+                                       <li class="sLi">
+                                           <a href="#" class="sm">회원사 현황</a>
+                                       </li>
+                                   </ul>
+                               </li>
+                               <li class="li">
+                                   <a href="#" class="mm">
+                                       <span>알림마당</span>
+                                       <em class="line"></em>
+                                   </a>
+                                   <ul class="sub" style="display: block; height: 285px; padding-top: 24px; margin-top:1px; margin-bottom: 0px; overflow: hidden;">
+                                       <li class="sLi">
+                                           <a href="#" class="sm">새소식</a>
+                                       </li>
+                                       <li class="sLi">
+                                           <a href="#" class="sm">주요일정</a>
+                                       </li>
+                                   </ul>
+                               </li>
+                           </ul>
+                       </div>
+<!--                       //gnb메뉴-->
+                       <button type="button" class="btnNavi menu">
+                           <span class="ico">전체메뉴 열기</span>
+                       </button>
+                   </div>
+               </div>
+           </div>
+       </header>
+       
+<!--       quicktop-->
+       <div class="fixQuickWrap" style="display: none;">
+	       <button type="button" class="btn quickTop" title="상단으로 이동">
+	           <span>TOP</span>
+	       </button>
+       </div>
+<!--       //quicktop-->
+<!--//header-->
+
+<!--container      -->
+       <div id="container">
+<!--visual-->
+           <!-- visual -->
+			<div class="vbWrap">
+				<div class="vbSlider">
+					<!-- item -->
+					
+							<!-- SEQ,BN_PC_IMG,BN_MOBILE_IMG,BN_IMG_ALT,BN_URL -->
+							<div class="item">
+								<a href="/trueelw/customerSupport/customerSupport.jsp?cmd=FO10510&amp;num=894" class="in">	
+									<div class="im" style="background-image:url('img/banner_Mobile1.png');"><img src="img/banner.png" alt="배너 이미지"></div>
+									<p class="blind">플친추가</p>
+									<div class="btnArea"><div class="btnDef defLink wh2"><span><em>자세히보기</em><em class="ico"></em></span></div></div>
+								</a>
+							</div>
+					
+							<!-- SEQ,BN_PC_IMG,BN_MOBILE_IMG,BN_IMG_ALT,BN_URL -->
+							<div class="item">
+								<a href="/trueelw/customerSupport/customerSupport.jsp?cmd=FO10510&amp;num=1039" class="in">	
+									<div class="im" style="background-image:url('img/banner_Mobile1.png');"><img src="img/banner2.png" alt="배너 이미지"></div>
+									<p class="blind">TRUE ELW 1월 14일(목) 신규상장!</p>
+									<div class="btnArea"><div class="btnDef defLink wh2"><span><em>자세히보기</em><em class="ico"></em></span></div></div>
+								</a>
+							</div>
+					
+							<!-- SEQ,BN_PC_IMG,BN_MOBILE_IMG,BN_IMG_ALT,BN_URL -->
+							<div class="item">
+								<a href="/trueelw/itemElw/itemElw.jsp?cmd=FO10240" class="in">	
+									<div class="im" style="background-image:url('img/banner_Mobile1.png')"><img src="img/banner3.png" alt="배너 이미지"></div>
+									<p class="blind">예상가테이블</p>
+									<div class="btnArea"><div class="btnDef defLink wh2"><span><em>자세히보기</em><em class="ico"></em></span></div></div>
+								</a>
+							</div>
+					
+							<!-- SEQ,BN_PC_IMG,BN_MOBILE_IMG,BN_IMG_ALT,BN_URL -->
+							<div class="item">
+								<a href="/trueelw/investGuide/investGuide.jsp?cmd=FO10401" class="in">	
+									<!-- 개발 :
+										- 클래스 im의 background 이미지는 모바일 이미지
+										- 클래스 im의 img 요소는 pc 이미지
+										- 클래스 blind의 텍스트는 이미제에 대한 대체텍스트
+										- 클래스 btnArea의 버튼은 해당 배너 링크
+									-->
+									<div class="im" style="background-image:url('img/banner_Mobile1.png')"><img src="img/banner4.png" alt="배너 이미지"></div>
+									<p class="blind">적은 금액으로 큰 레버리지 효과! 주식/지수에 직접 투자할 때보다 적은 금액으로 더 큰 수익을 달성할 수 있습니다.</p>
+									<div class="btnArea"><div class="btnDef defLink wh2"><span><em>자세히보기</em><em class="ico"></em></span></div></div>
+								</a>
+							</div>
+					 
+					
+				
+				
+				</div>
+				<div class="slick-nav">
+					<div class="dot">
+						<div class="slick-controls">
+							<button type="button" class="btn play"><span class="ico">재생</span></button>
+							<button type="button" class="btn stop"><span class="ico">멈춤</span></button>
+						</div>
+					</div>
+				</div>
+			</div>
+           
+           
+           
+           
+<!--           //visual-->
+<!--          section-->
+           <section class="section sec1 secAct active">
+               <div class="inner row type1">
+                   <h3 class="kitia-tit">KITIA 사업안내</h3>
+                   <div class="container1">
+                       <ul class="business-list">
+                          <li>
+                             <a href="#">
+                                <div class="business-item">
+                                  <span>
+                                     <img src="img/icon1.png" alt="투자연계형R&D" class="grow-img">
+                                  </span>
+                                </div>
+                                <p>
+                                  <strong>투자연계형<br>R&D</strong>
+                                </p>
+                             </a>
+                          </li>
+                          <li>
+                             <a href="#">
+                                <div class="business-item">
+                                  <span>
+                                     <img src="img/icon2.png" alt="투자연계형R&D" class="grow-img">
+                                  </span>
+                                </div>
+                                <p>
+                                  <strong>투자유치<br>지원사업</strong>
+                                </p>
+                             </a>
+                          </li>
+                          <li>
+                             <a href="#">
+                                <div class="business-item">
+                                  <span>
+                                     <img src="img/icon3.png" alt="투자연계형R&D" class="grow-img">
+                                  </span>
+                                </div>
+                                <p>
+                                  <strong>투자연계형<br>기술확보<br>지원사업</strong>
+                                </p>
+                             </a>
+                          </li>
+                          <li>
+                             <a href="#">
+                                <div class="business-item">
+                                  <span>
+                                     <img src="img/icon4.png" alt="투자연계형R&D" class="grow-img">
+                                  </span>
+                                </div>
+                                <p>
+                                  <strong>소재부품글로벌<br>자연계기술<br>개발사업</strong>
+                                </p>
+                             </a>
+                          </li>
+                          <li>
+                             <a href="#">
+                                <div class="business-item">
+                                  <span>
+                                     <img src="img/icon5.png" alt="투자연계형R&D" class="grow-img">
+                                  </span>
+                                </div>
+                                <p>
+                                  <strong>소재부품장비<br>투자협력사업</strong>
+                                </p>
+                             </a>
+                          </li>
+                          <li>
+                             <a href="#">
+                                <div class="business-item">
+                                  <span>
+                                     <img src="img/icon6.png" alt="투자연계형R&D" class="grow-img">
+                                  </span>
+                                </div>
+                                <p>
+                                  <strong>소재부품장비<br>전문투자조합</strong>
+                                </p>
+                             </a>
+                          </li>
+                          
+                          
+                           
+<!--
+                           <div class="col-md-4 item">
+                               <img src="img/icon3.png" alt="투자연계형R&D" class="grow-img">
+                               <h4>투자연계형<br>기술확보지원사업</h4>
+                           </div>
+                           <div class="col-md-4 item">
+                               <img src="img/icon4.png" alt="투자연계형R&D" class="grow-img">
+                               <h4>소재부품글로벌<br>자연계기술개발사업</h4>
+                           </div>
+                           <div class="col-md-4 item">
+                               <img src="img/icon5.png" alt="투자연계형R&D" class="grow-img">
+                               <h4>소재부품장비<br>투자협력사업</h4>
+                           </div>
+                           <div class="col-md-4 item">
+                               <img src="img/icon6.png" alt="투자연계형R&D" class="grow-img">
+                               <h4>소재부품장비<br>전문투자조합</h4>
+                           </div>
+-->
+                       </ul>
+                   </div>
+               </div>
+           </section>
+<!--           //section-->
+<!--          section-->
+           <section class="section sec2 secAct active">
+              <div class="inner row type2">
+                  <div class="col text">
+                      <h2 class="hTit">30개국 200여개 M&A전문기관</h2>
+                      <p class="txt">발굴 및 중계에 특화된 협력 네트워크 구축</p>
+                      <div class="btnWrap">
+                          <button type="button" class="btnDef defLink wh1">
+                              <span>
+                                  <em>자세히보기</em>
+                                  <em class="ico"></em>
+                              </span>
+                          </button>
+                      </div>
+                  </div>
+                  <div class="col im">
+                      <div class="imObj">
+                        <span class="lineTxt lt1">M&A 성사지원</span>
+                        <div class="line line1">
+                            <span class="ln l2"></span>
+                            <span class="ln l1"></span>
+                            <span class="dot"></span>
+                        </div>
+                        <span class="lineTxt lt2">글로벌마켓 분석</span>
+                        <div class="line line2">
+                            <span class="ln l2"></span>
+                            <span class="ln l1"></span>
+                            <span class="dot"></span>
+                        </div>  
+                      </div>
+                      
+                  </div>
+              </div> 
+           </section>
+<!--           //section-->
+
+<!--           secton-->
+           <section class="section sec3 secAct">
+               <div class="inner">
+                   <div class="titWrap">
+                       <h2 class="hTit">회원사 현황</h2>
+                       <p class="txt">지금 바로 KTIA회원사에 가입하시고<br>새로운 미래를 설계하세요!</p>
+                   </div>
+                   
+                   <div class="im">
+<!--                       banner-->
+                      <div class="mainRollBanWrap rollBan1">
+                          <ul>
+                              <li><img src="img/im_main_rollBan01.png" alt="삼성전자"></li>
+                              <li><img src="img/im_main_rollBan02.png" alt="삼성전자"></li>
+                              <li><img src="img/im_main_rollBan03.png" alt="삼성전자"></li>
+                              <li><img src="img/im_main_rollBan04.png" alt="삼성전자"></li>
+                              <li><img src="img/im_main_rollBan05.png" alt="삼성전자"></li>
+                              <li><img src="img/im_main_rollBan06.png" alt="삼성전자"></li>
+                              <li><img src="img/im_main_rollBan07.png" alt="삼성전자"></li>
+                              <li><img src="img/im_main_rollBan08.png" alt="삼성전자"></li>
+                              <li><img src="img/im_main_rollBan09.png" alt="삼성전자"></li>
+                              <li><img src="img/im_main_rollBan10.png" alt="삼성전자"></li>
+                              <li><img src="img/im_main_rollBan11.png" alt="삼성전자"></li>
+                              <li><img src="img/im_main_rollBan12.png" alt="삼성전자"></li>
+                          </ul>
+                      </div>
+<!--                      //banner-->
+<!--                  banner-->
+                      <div class="mainRollBanWrap rollBan2">
+                          <ul>
+                              <li><img src="img/im_main_rollBan13.png" alt="삼성전자"></li>
+                              <li><img src="img/im_main_rollBan14.png" alt="삼성전자"></li>
+                              <li><img src="img/im_main_rollBan15.png" alt="삼성전자"></li>
+                              <li><img src="img/im_main_rollBan16.png" alt="삼성전자"></li>
+                              <li><img src="img/im_main_rollBan17.png" alt="삼성전자"></li>
+                              <li><img src="img/im_main_rollBan18.png" alt="삼성전자"></li>
+                              <li><img src="img/im_main_rollBan19.png" alt="삼성전자"></li>
+                              <li><img src="img/im_main_rollBan20.png" alt="삼성전자"></li>
+                              <li><img src="img/im_main_rollBan21.png" alt="삼성전자"></li>
+                              <li><img src="img/im_main_rollBan22.png" alt="삼성전자"></li>
+                              <li><img src="img/im_main_rollBan23.png" alt="삼성전자"></li>
+                              <li><img src="img/im_main_rollBan24.png" alt="삼성전자"></li>
+                          </ul>
+                      </div>
+<!--                      //banner-->
+                   </div>
+                   <div class="btnWrap">
+                       <button type="button" class="btnDef defLink"><span><em>회원사 가입</em><em class="ico"></em></span></button>
+                   </div>
+               </div>
+           </section>
+<!--            //section-->
+          
+<!--          section-->
+           <section class="section sec4 secAct">
+               <div class="inner">
+                   <div class="titWrap">
+                       <h2 class="hTit">소재 · 부품 · 장비<br>기업들의 미래 KITIA</h2>
+                   </div>
+                   
+                   <div class="im">
+                       <ul class="awardUl">
+                           <li class="li1"></li>
+                           <li class="li2"></li>
+                           <li class="li3"></li>
+                       </ul>
+                   </div>
+                   
+                   <div class="originTxt">
+                       <p class="name">출처:KITIA</p>
+                       <p class="date">2021.01.13기준</p>
+                   </div>
+               </div>
+               <div class="bg"></div>
+           </section>
+           <section class="section secEtc"></section>
+       </div>
+<!--       //container-->
+<!--  footer-->
+        <script>
+            
+	$(window).bind("pageshow", function (event) {
+		if (event.originalEvent.persisted) {
+			front.loading.hide();			
+		} else {
+			front.loading.init();
+		}
+	});
+        </script>
+        <footer id="footer">
+            <div class="inner">
+                <div class="f-logo"><span class="blind">KITIA</span></div>
+                <ul class="f-menu">
+                    <li class="menu">
+                        <a href="#" class="m1" target="_blank" title="새창열림">개인정보처리방침</a>
+                        <a href="#" class="m2" target="_blank" title="새창열림">이용약관 및 고객유의사항</a>
+                    </li>
+                    <li class="tel">Tel: 02-6000-7070</li>
+                </ul>
+                <p class="f-copy">Copyright Korea Core Industrial Technology Investment
+                    <br>Association All Rights Reserved.
+                </p>
+                <select class="f-select" onchange="if(this.value) window.open(this.value)" title="패밀리 사이트">
+                    <option >Family Site</option>
+                    <option value="http://hubdnc90.cafe24.com/index.php">KITIA</option>
+                    <option value="http://www.motie.go.kr/www/main.do">산업통상자원부</option>
+                    <option value="https://www.keit.re.kr/">한국산업기술평가관리원</option>
+                    <option value="http://www.kiat.or.kr/">한국산업기술진흘원</option>
+                    <option value="https://www.keiti.re.kr:8445/site/keiti/main.do">KITIA한국환경산업기술원</option>
+                    <option value="http://www.kvca.or.kr/">KVCA</option>
+                    <option value="http://www.mctnet.org/index.jsp">소재부품종합정보망</option>
+                    
+                </select>
+            </div>
+        </footer>
+        <div id="toolOpen" class="layerHtml"></div>
+        <div id="FO10240_infoOpen" class="layerHtml"></div>
+   </div> 
+<!--   모바일영역 -->
+    <div class="allMenuWrap open">
+        <div class="allIn" tabindex="0">
+            <h2 class="blind">전체메뉴</h2>
+            <div class="allHd">
+                <button type="button" class="btnNavi home">
+                    <span class="blind">KITIA</span>
+                </button>
+            </div>
+<!--            gnb메뉴-->
+            <div class="gnbMenuWrap">
+                <ul>
+                    <li class="li">
+                        <a href="#" class="mm">
+                            <span>회사소개</span>
+                            <em class="line"></em>
+                            <span class="arr">
+                                <i class="ico">열기</i>
+                            </span>
+                        </a>
+                        <ul class="sub">
+                            <li class="sLi">
+                                <a href="" class="sm">인사말</a>
+                            </li>
+                            <li class="sLi">
+                                <a href="" class="sm">협의회소개</a>
+                            </li>
+                            <li class="sLi">
+                                <a href="" class="sm">연혁</a>
+                            </li>
+                            <li class="sLi">
+                                <a href="" class="sm">찾아오시는길</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="li">
+                        <a href="#" class="mm">
+                            <span>사업소개</span>
+                            <em class="line"></em>
+                            <span class="arr">
+                                <i class="ico">열기</i>
+                            </span>
+                        </a>
+                        <ul class="sub">
+                            <li class="sLi">
+                                <a href="" class="sm">투자연계형R&B</a>
+                            </li>
+                            <li class="sLi">
+                                <a href="" class="sm">투자유치지원사업</a>
+                            </li>
+                            <li class="sLi">
+                                <a href="" class="sm">투자연계형기슬확보지원사업</a>
+                            </li>
+                            <li class="sLi">
+                                <a href="" class="sm">소재부품글로벌투자연계기술개발사업</a>
+                            </li>
+                            <li class="sLi">
+                                <a href="" class="sm">소재부품글로벌투자협력사업</a>
+                            </li>
+                            <li class="sLi">
+                                <a href="" class="sm">소재부품전문투자조합</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="li">
+                        <a href="#" class="mm">
+                            <span>회원사</span>
+                            <em class="line"></em>
+                            <span class="arr">
+                                <i class="ico">열기</i>
+                            </span>
+                        </a>
+                        <ul class="sub">
+                            <li class="sLi">
+                                <a href="" class="sm">회원사가입안내</a>
+                            </li>
+                            <li class="sLi">
+                                <a href="" class="sm">회원사현황</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="li">
+                        <a href="#" class="mm">
+                            <span>알림마당</span>
+                            <em class="line"></em>
+                            <span class="arr">
+                                <i class="ico">열기</i>
+                            </span>
+                        </a>
+                        <ul class="sub">
+                            <li class="sLi">
+                                <a href="" class="sm">새소식</a>
+                            </li>
+                            <li class="sLi">
+                                <a href="" class="sm">주요일정</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+                
+            </div>
+            <button type="button" class="btnNavi close">
+                <span class="ico">전체메뉴닫기</span>
+            </button>
+        </div>
+        <div class="allBg"></div>
+    </div>
+<!--    //모바일메뉴영역-->
+<script type="text/javascript">
+$(function(){
+	//visual banner
+	mainVbAni();
+
+	//rolling banner
+	mainRollAni();
+});
+</script>
+
+
+<script type="text/javascript">
+AooFJj7hHQpQQ();
+</script>
+
+   
+</body>
+</html>

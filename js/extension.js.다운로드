@@ -1,0 +1,1026 @@
+/*******************************************************************************
+ * file name : extension.js
+ * author : ohy
+ * date : 2020-02-24
+ * skill : interaction script
+******************************************************************************/
+var front = {
+    st : null,
+    init : function(){
+        front.isMain = ($("#wrap").is(".main")) ? true : false;
+        front.isQuick = ($(".fixQuickWrap").length > 0) ? true : false;
+        front.isTblFix = ($(".tblFix").length > 0) ? true : false;
+        front.isTblGraph = ($(".dataTbl.graph").length > 0) ? true : false;
+
+        front.common.form();
+        front.common.accordion();
+        front.common.toggle();
+        front.common.tab();
+        front.scroll.active();
+
+        (front.isTblGraph) ? front.tblGraph.barAni() : '';
+     },
+    device : {
+        mobileWidth : 1099,
+        currentWidth : function(){
+            return window.innerWidth >= $(document).width() ? window.innerWidth : $(document).width();
+        },
+        isWeb : function(){
+            return this.currentWidth() > this.mobileWidth;
+        },
+        isMob : function(){
+                return this.currentWidth() <= this.mobileWidth;
+        },
+        isTablet : function(){
+                return 768 <= this.currentWidth() && this.currentWidth() < 1100;
+        },
+    },
+    scroll : {
+        active : function(){
+            var $wrap = $("#wrap");
+            front.st = $(window).scrollTop();
+
+            (front.st > 50) ? $wrap.addClass('fixed') : $wrap.removeClass('fixed');
+            (front.isMain) ? front.main.secAct() : '';
+            (front.isQuick && $(window).scrollTop() > 100) ? $(".fixQuickWrap").fadeIn() : $(".fixQuickWrap").fadeOut();
+        },
+    },
+    scrollEvent : {
+        reset: function(){
+            $("#wrap").removeClass("down up");
+        },
+        init : function(){
+            front.scrollEvent.lastScrollTop = 50;
+            front.scrollEvent.delta = 50;
+        },
+        active: function(){
+            var $win = $(window);
+            var $st2 = $win.scrollTop();
+            var $wrap = $("#wrap");
+
+            if(Math.abs(front.scrollEvent.lastScrollTop - $st2) <= front.scrollEvent.delta) return;
+
+            if($st2 > front.scrollEvent.lastScrollTop && front.scrollEvent.lastScrollTop > 30){
+                $wrap.removeClass("up").addClass("down");
+            }else if(front.scrollEvent.lastScrollTop < 30){
+                $wrap.removeClass("down up");
+            }else if($st2 < front.scrollEvent.lastScrollTop && front.scrollEvent.lastScrollTop > 30){
+                $wrap.removeClass("down").addClass("up");
+            }
+
+            front.scrollEvent.lastScrollTop = $st2;
+        },
+    },
+    resize : function(){
+            if(front.isMain && !front.device.isWeb()){
+                var $height = parseInt($(window).height() * 0.9);
+                ($height > 500) ? $(".vbWrap").css("height", $height) : $(".vbWrap").css("height", "");
+            }else{
+                $(".vbWrap").css("height", "");
+            };
+
+            if(front.device.isWeb()){
+                $("html").removeClass("isMob isTablet").addClass("isWeb");
+            }else if(front.device.isTablet()){
+                $("html").removeClass("isWeb").addClass("isMob isTablet");
+            }else if(front.device.isMob()){
+                $("html").removeClass("isWeb isTablet").addClass("isMob");
+            }
+
+    },
+    common : {
+        form : function(){
+            /* input start */
+            $(".intAct .btn.del").on("click", function(){
+                $(this).siblings("input").val('');
+            });
+
+            $(".intAct input").on("focusin", function(){
+                $(this).closest(".intAct").addClass("focus");
+            });
+
+            $(".intAct input").on("keyup", function(){
+                $(this).closest(".intAct").removeClass("focus").addClass("active");
+            });
+
+            $(".intAct").on("focusout", function(){
+                var _val = $(this).find("input").val();
+                (_val.length == 0) ? $(this).closest(".intAct").removeClass("active focus") : '';
+            });
+            /* input end */
+        },
+        accordion : function(){
+            $(".accAct .accLi.open .accCnt").each(function(){
+                $(this).css("display","block");
+            });
+
+            $(document).on("click", ".accAct .accTit", function(){
+                var _ = $(this);
+                var $parent = _.closest(".accLi");
+                var $accLi = _.closest(".accLi").siblings(".accLi");
+
+                if(!$parent.is(".open")) {
+                    $parent.toggleClass("on").siblings(".accLi").removeClass("on open");
+                    _.closest(".accTit").next(".accCnt").slideToggle(function(){
+                        if($(this).closest(".lyCnt").length == 0){
+                            var $titOffsetTop = _.offset().top;
+                            var $hdHeight = $("#header").height();
+                            var $value = parseInt($titOffsetTop - $hdHeight);
+                            $("body,html").stop().animate({scrollTop : $value});
+                        }else{
+                            var $titOffsetTop = parseInt(_.position().top);
+                            var $hdHeight = $(".lyTit").height();
+                            var $value = parseInt($titOffsetTop);
+                            $(".lyCnt").animate({scrollTop : $value});
+                        }
+
+                    });
+                }else{
+                    $parent.removeClass("open").find(".accCnt").slideUp();
+                }
+
+                ($parent.hasClass("on")) ? _.find(".arr .ico").text("닫기").closest(".accLi").siblings(".accLi").find(".arr .ico").text("열기") :_.find(".arr .ico").text("열기");
+
+                $($accLi).each(function(){
+                    var _ = $(this);
+                    (!_.is(".open")) ? _.find(".accCnt").slideUp() : '';
+                });
+            });
+        },
+        tab : function(){
+            $(".tabAct").each(function(){
+                var _ = $(this);
+
+                if(!_.find(".tabMenu .on").is(".tab")) {
+                    var $id = _.find(".on a").attr("data-id");
+                }else{
+                    var $id = _.find(".on").attr("data-id");
+                }
+                $("#" + $id).addClass("dpb").siblings(".tabCnt").removeClass("dpb");
+            });
+
+            $(".tabMenu a").on("click", function(){
+                var _ = $(this);
+                (!_.is(".tab")) ? _.parent().addClass("on").siblings("li").removeClass("on") : _.addClass("on").siblings("a").removeClass("on");
+            });
+
+            $(".tabAct .tabMenu a").on("click", function(){
+                var _ = $(this);
+                var $id = _.attr("data-id");
+                $("#" + $id).addClass("dpb").siblings(".tabCnt").removeClass("dpb");
+            });
+
+            $(".tabAct li a").on("click", function(){
+                var _ = $(this),
+                    $id = _.attr("data-id");
+                $("#" + $id).addClass("dpb").siblings(".tabCnt").removeClass("dpb");
+            });
+        },
+        toggle : function(){
+            $(".toggle .toggBtn").on("click", function(){
+                var _ = $(this);
+                var $toggTit = _.closest(".toggTit");
+
+                if($toggTit.is(".on")){
+                    _.children(".ico").text("열기");
+                    $toggTit.removeClass("on").next(".toggCnt").hide();
+                }else{
+                    _.children(".ico").text("닫기");
+                    $toggTit.addClass("on").next(".toggCnt").show();
+                }
+
+            });
+        },
+    },
+    tblGraph:{
+        mBarInit:function(){
+            $(".dataTbl.graph .bar").css("width","");
+        },
+        mBarWidth:function(){
+            setTimeout(function(){
+                var $arr=[];
+                var $sum =0;
+                var $thName;
+
+                ($(".dataTbl.graph").is(".tblFix")) ? $thName = $(".dataTbl.graph .tblCnt") : $thName=$(".dataTbl.graph");
+
+                $thName.find("thead th").each(function(i){
+                    var $thW = Math.round($(this).outerWidth());
+                    $arr.push($thW);
+                });
+                for (var i=0; i < 5; i++){
+                    $sum += $arr[i];
+                }
+
+                var $arrLen = $arr.length;
+                var $barTxtW = $arr[4];
+
+                $(".dataTbl.graph .bar").css({
+                    "width":$sum,
+                });
+
+            }, 50);
+
+        },
+        barAni:function(){
+            $(".dataTbl.graph .barTxt").each(function(){
+                $(this).removeClass("zero");
+            });
+
+            $(".dataTbl.graph .bar").on("click", function(){
+                $(this).find(".barTxt span").toggle();
+            });
+        },
+    },
+    main : {
+        secAct : function(){
+            var $scrollTop =$(document).scrollTop();
+            var $deviceHeight = $(window).height();
+
+            setTimeout(function(){
+                $('.main .secAct').each(function(i) {
+                    var $offTop = $(this).offset().top;
+                    if($offTop < $deviceHeight){
+                        $(this).addClass("active");
+                    }else{
+                        if (( $offTop - 600) <= $scrollTop) {
+                            $('.secAct').eq(i).addClass('active');
+                        }
+                    }
+                });
+
+            },0);
+        },
+        rollBan : function(target, speed1, speed2){
+            var _ = $(target);
+            var $ul = _.find("ul");
+    		var $elem = _.find("li").eq(0);
+    		var $elemWidth = _.find("li").outerWidth();
+            var $speed = (front.device.isMob()) ? $speed = speed2 : $speed = speed1;
+
+    		$ul.stop().animate({"left" : -$elemWidth}, $speed, "linear", function(){
+    			var $ulPos = Math.abs(_.find("ul").position().left);
+                var $elemWidth2 = _.find("li").outerWidth();
+                var $widthValue = Math.abs($elemWidth - $elemWidth2);
+
+    			if($ulPos = $elemWidth || $ulPos > $elemWidth){
+                    $ul.append($elem);
+
+                    if($elemWidth == $elemWidth2){
+                        $ul.css("left", 0);
+                    }else if($elemWidth < $elemWidth2) {
+                        $ul.css("left", $widthValue);
+                    }else if($elemWidth > $elemWidth2) {
+                        $ul.css("left", -$widthValue);
+                    }
+
+    				front.main.rollBan(target, speed1, speed2);
+    			}
+    		});
+        },
+    },
+    allMenu : {
+        init: function(){
+            var $body = $("body");
+            var $allMenuWrap = $(".allMenuWrap");
+            var $allMenuIn = $(".allMenuWrap .allIn");
+            var $dim = $("#dim");
+
+            $body.removeClass("noScroll").off("touchmove");
+            $allMenuWrap.removeAttr("tabindex, style").removeClass("open");
+            $allMenuIn.removeAttr("tabindex, style");
+            $allMenuWrap.find(".sub, .subUl").removeClass("on").removeAttr("style");
+            $(".allMenuWrap  .gnbMenuWrap, .allMenuWrap  .gnbMenuWrap .mm").removeClass("on");
+            $(".allMenuWrap  .gnbMenuWrap .mm .arr").remove();
+
+            $("#wrap").css("top","");
+        },
+        open : function(){
+            var $body = $("body");
+            var $mm = $(".allMenuWrap .gnbMenuWrap .mm");
+            var $dim = $("#dim");
+            var $scrollTop = $(window).scrollTop();
+
+            $("#wrap").css("top",-$scrollTop);
+
+            $mm.each(function(){
+                var _ = $(this);
+                (_.find(".arr").length == 0 ) ? _.append('<span class="arr"><i class="ico">열기</i></span>') : '';
+            });
+
+            $(".allMenuWrap").show().addClass("open");
+            $(".allMenuWrap .allIn").attr("tabindex",0).focus();
+            ($dim.length == 0) ? $("body").append("<div id='dim'></div>").find("#dim").fadeIn() : $dim.fadeIn(100);
+            $body.addClass("noScroll").on("touchmove", function(e){
+                e.preventDefault();
+            });
+
+            $(".allMenuWrap .subUl").each(function(){
+                $(this).prev(".sm").addClass("type2");
+            });
+
+            $(".allMenuWrap .allBg").on("click", function(){
+                front.allMenu.close();
+            });
+        },
+        close : function(){
+            var $body = $("body");
+            var $allMenuWrap = $(".allMenuWrap");
+            var $dim = $("#dim");
+
+            $allMenuWrap.removeClass("open on");
+            $("#header .btnNavi.menu").focus();
+            $dim.fadeOut(400, function(){$dim.remove();});
+            $body.removeClass("noScroll").off("touchmove");
+            $(".allMenuWrap .gnbMenuWrap .mm, .allMenuWrap .gnbMenuWrap .sub , .allMenuWrap .gnbMenuWrap .subUl").removeClass("on").removeAttr("style");
+            $(".allMenuWrap .gnbMenuWrap .mm .arr .ico").text("열기");
+
+            var $scrollTop = parseInt($("#wrap").css("top"))*-1;
+            $("#wrap").css("top","");
+            $(window).scrollTop($scrollTop);
+        }
+    },
+    gnbMenu : {
+        open : function(){
+            var $body = $("body");
+            var $allMenuWrap = $(".allMenuWrap");
+
+            ($("#header #dim").length == 0) ? $("#header").append("<div id='dim'></div>").find("#dim").fadeIn(300) : $("#dim").fadeIn(300);
+            $("#header .gnbMenuWrap .sub").stop().slideDown(300);
+        },
+        close : function(){
+            var $body = $("body");
+            var $dim = $("#header #dim");
+            var $allMenuWrap = $(".allMenuWrap");
+
+            $("#header, .gnbMenuWrap, .gnbMenuWrap .mm").removeClass("on");
+            $("#header .gnbMenuWrap .sub").stop().slideUp(300, function(){
+                $(this).removeAttr("style");
+            });
+
+            $dim.fadeOut(300);
+        },
+    },
+    layer : {
+        open : function(id, add){
+            var $body = $("body");
+            var $layerWrap = $(".layerWrap");
+            var $layerId = $(id);
+            var $layerCnt = $layerId.html();
+            var $layerPop = '<div class="layerWrap">'+
+                            '<div class="row">'+
+                            '<div class="col">'+ $layerCnt +
+                            '</div>'+
+                            '</div>'+
+                            '</div>';
+
+            var $scrollTop = $(window).scrollTop();
+
+            (front.device.isMob()) ? $("#wrap").css("top",-$scrollTop) : "";
+            $(window).on("resize", function(){
+                (front.device.isWeb()) ? $("#wrap").css("top",""): "";
+            });
+
+            front.layer.layId = $(id);
+
+            ($layerWrap.length == 0) ? front.layer.lastFoucs = $body.find(":focus") : '';
+
+            $layerWrap.hide().remove();
+            $body.addClass("noScroll").on("touchmove", function(e){
+                e.preventDefault();
+            }).append($layerPop).find(".layerIn").attr("tabindex","0").focus();
+
+            $layerId.find(".layerIn").remove();
+
+            ($(".layerWrap .layerIn").is(".type1")) ? $(".layerWrap").closest(".layerWrap").addClass("type1") : '';
+
+            //($body.find("#dim").length == 0) ? $body.append('<div id="dim"></div>') : '';
+            $body.append('<div id="dim"></div>');
+            front.layer.id = $body.find(":focus").closest(".layerWrap");
+
+            $(".ly-close").on("click", function(){
+                front.layer.close();
+            });
+
+            add = typeof add !== 'undefined' ? add() : '' ;
+
+            //select again active
+            if($(".layerWrap .select").length > 0){
+                $(".layerWrap .select-list-box").remove();
+                $(".layerWrap .select").sSelect();
+            }
+        },
+        close : function(func){
+            var $body = $("body");
+            var $len = $(".layerWrap").length;
+            var $value = front.layer.id.find(".col").html();
+
+            front.layer.id.hide().remove();
+            front.layer.lastFoucs.focus();
+            front.layer.layId.html($value);
+            $body.removeClass("noScroll").off("touchmove").find("#dim").hide().remove();
+            ($body.find("#dim").length == 0) ? '' : $("#dim").hide().remove();
+
+            func = typeof func !== 'undefined' ? func() : '' ;
+
+            var $scrollTop = parseInt($("#wrap").css("top"))*-1;
+            $("#wrap").css("top","");
+            (front.device.isMob()) ?  $(window).scrollTop($scrollTop) : "";
+        },
+    },
+    tblFixed : {
+        reset : function(){
+            $(".tblFix .tblHd").remove();
+        },
+        active: function(){
+            $(".tblFix").each(function(){
+                var _ = $(this);
+                var $tblHd = _.find(".tblHd");
+                var $offsetTop = _.offset().top;
+                var $gnbHeight = $("#header").outerHeight();
+                var $trLen = _.find(".tblCnt thead tr").length;
+                var $tblHdHtml = '<div class="tblHd">' +
+                    '<div class="in">'+
+                        '<table>'+
+                            '<thead>'+
+                                _.find(".tblCnt thead").html(); +
+                            '</thead>'+
+                            '</table>'+
+                    '</div>';
+
+                (_.find(".tblHd").length == 0) ? _.prepend($tblHdHtml) :'';
+                ($trLen > 1) ? _.find(".tblHd").addClass("tr" + $trLen) : '';
+
+                setTimeout(function(){
+                    var $width = _.find(".tblCnt").outerWidth();
+                    _.find(".tblHd table").css("width", $width);
+
+                    _.find(".tblCnt th").each(function(i){
+                        var $th = $(this);
+                        var $len = _.find(".tblCnt th").length;
+
+                        if((i+1) == 1){
+                            var $widthTh = $th.innerWidth();
+                            _.find(".tblHd th").eq(i).css("width", $widthTh);
+                        }else if($len >= (i + 1)){
+                            var $widthTh = $th.innerWidth();
+                            _.find(".tblHd th").eq(i).css("width", $widthTh + 1);
+                        }
+                    });
+                },100);
+
+                if($(window).scrollTop() > $offsetTop) {
+                    $tblHd.show();
+                } else {
+                    $tblHd.hide();
+                }
+
+                _.scroll(function(){
+                    var scrollLeft = _.scrollLeft();
+                    _.find(".tblHd .in").css("left",-scrollLeft);
+                });
+
+            });
+        },
+    },
+    loading : {
+        init:function(){
+            var $load = '<div class="loading">'+
+                    	'<div class="loadIm"><span class="blind">로딩중</span></div>'+
+                    	'</div>';
+
+            ($(".loading").length == 0) ? $("body").append($load) : '';
+        },
+        show:function(){
+            $(".loading").show();
+        },
+        hide:function(){
+            $(".loading").hide();
+        },
+    },
+};
+
+
+$(function(){
+    //select start
+    $.fn.sSelect = function(options){
+		var numberId = Math.floor(Math.random()*10000+1);
+
+		return this.each(function(i){
+            var $wd;
+            var $isWd = $(this).get(0).style.width;
+
+            if($isWd === ""){
+                $wd = 100 +"%";
+            }else{
+                $wd = $isWd;
+            }
+            var $selectedVal = $(this).find("option:selected").text();
+            var $initTxt = (!$(this).find("option:selected")) ? '선택' : $selectedVal;
+			var defaults = {
+					defaultText : $initTxt,
+					listWidth : $wd,
+					animationSpeed : 0,
+					listMaxHeight : '325',
+					containerClass : '',
+					containerOnClass : 'select-list-on',
+					disabled : ($(this).is(":disabled")) ? true : false,
+					id : 'div' + numberId,
+					response : false
+			};
+
+			var opts = $.extend(defaults, options),
+			$input = $(this),
+			$containerDivText = $('<div class="selected-headline"></div>'),
+			$containerDiv = $('<div class="select-list-box ' + opts.containerClass + '" id="' + opts.id + '"></div>'),
+			$newUl = $('<ul class="select-list" style="visibility:hidden;"></ul>'),
+			itemIndex = -1,
+			currentIndex = -1,
+			keys = [],
+			prevKey = false,
+			prevented = false,
+			$newLi;
+
+			$(this).data('ssOpts', options);
+
+            if($input.attr("disabled") == undefined){
+                $containerDiv.insertAfter($input);
+    			$containerDiv.attr('tabindex', $input.attr("tabindex") || "0");
+                $containerDiv.css("width", opts.listWidth);
+    			$containerDivText.prependTo($containerDiv);
+    			$newUl.appendTo($containerDiv);
+    			$input.hide().addClass("act");
+            }
+
+			$containerDivText.data('ssReRender', !$containerDivText.is(':visible'));
+            $input.children().each(function(i){
+                var option = $(this).html();
+                var key = $(this).val();
+
+                keys.push(option.charAt(0).toLowerCase());
+                if($(this).attr('data-selected') == "true"){
+                    opts.defaultText = option;
+                    currentIndex = i;
+                    $containerDiv.addClass('selected-list-box');
+                }
+                $newUl.append($('<li><a href="#none">' + option + '</a></li>').data('key', key));
+            });
+            $newLi = $newUl.children().children();
+
+			var newUlHeight = $newUl.outerHeight(),
+			containerHeight = $containerDiv.outerHeight(),
+			newLiLength = $newLi.length;
+
+			if(currentIndex != -1){
+				navigateList(currentIndex, true);
+			}else{
+				$containerDivText.html(opts.defaultText);
+			}
+
+			function newUlPos(){
+                var $select = $(".select");
+                var $selectBox = $(".select-list-box");
+
+                if(front.device.isWeb() && $selectBox.length > 0) {
+                    $selectBox.show();
+                    var $selectedTxt= $input.find("option:selected").text();
+                    var newUlHeight = $newUl.outerHeight();
+                    var containerHeight = $containerDiv.outerHeight();
+                    $input.next(".select-list-box").find(".selected-headline").html($selectedTxt);
+                    ($input.is(":disabled")) ? $input.show() : $input.hide();
+                }else if(front.device.isMob()){
+                    $selectBox.hide();
+                    $select.show();
+                }
+
+				var containerPosY = $containerDiv.offset().top;
+				var docHeight = jQuery(window).height();
+				var scrollTop = jQuery(window).scrollTop();
+
+				if(newUlHeight > parseInt(opts.listMaxHeight)){
+					newUlHeight = parseInt(opts.listMaxHeight);
+				}
+
+				containerPosY = containerPosY-scrollTop;
+				if(containerPosY + newUlHeight >= docHeight){
+                    $newUl.css({
+                        bottom : containerHeight+'px',
+                        height : newUlHeight
+                    });
+
+					$input.onTop = true;
+				}else{
+                    $newUl.css({
+                        top : containerHeight-1+'px',
+                        height : newUlHeight
+                    });
+
+					$input.onTop = false;
+				}
+			}
+
+			newUlPos();
+
+            $(window).on('resize.sSelect scroll.sSelect', newUlPos);
+
+			function positionFix(){
+				$containerDiv.css('position', 'relative');
+			}
+			function positionHideFix(){
+			    //$containerDiv.css('position', 'static');
+			}
+
+            $containerDivText.on('click.sSelect', function(event){
+				if(opts.disabled){
+					return false;
+				}else{
+					event.stopPropagation();
+
+					if($(this).data('ssReRender')){
+						newUlHeight = $newUl.innerHeight();
+						containerHeight = $containerDiv.innerHeight();
+						$(this).data('ssReRender', false);
+						newUlPos();
+					}
+
+					$('.select-list').not($(this).next()).hide()
+						.parent().removeClass('select-list-focus select-list-on');
+
+					$newUl.toggle();
+					positionFix();
+					try{
+						if(currentIndex == -1){
+							$newLi.eq(0).focus();
+						}else{
+							$newLi.eq(currentIndex).focus();
+						}
+					}catch (ex){
+
+					}
+					if($newUl.is(":hidden")){
+						$containerDiv.removeClass(opts.containerOnClass);
+					}else{
+						$containerDiv.addClass(opts.containerOnClass);
+					}
+				}
+			});
+
+			$newLi.on('click.sSelect', function(e){
+				var $clickedLi = $(e.target);
+				currentIndex = $newLi.index($clickedLi);
+				prevented = true;
+				navigateList(currentIndex);
+				$newUl.hide();
+				$containerDiv.removeClass(opts.containerOnClass);
+			});
+
+			$newLi.on('mouseenter.sSelect', function(e){
+				var $hoveredLi = $(e.target);
+				$hoveredLi.addClass('select-list-hover');
+			}).on('mouseleave.sSelect', $newLi, function(e){
+				var $hoveredLi = $(e.target);
+				$hoveredLi.removeClass('select-list-hover');
+			});
+
+			function navigateList(currentIndex, init){
+				$containerDiv.addClass('selected-list-box');
+				$newLi.removeClass('select-list-selected').eq(currentIndex).addClass('select-list-selected');
+				if($newUl.is(':visible')){
+					try{
+						if(currentIndex == -1){
+							$newLi.eq(0).focus();
+						}else{
+							$newLi.eq(currentIndex).focus();
+						}
+					}catch (ex){
+
+					}
+
+				}
+
+				var text = $newLi.eq(currentIndex).html();
+				var val = $newLi.eq(currentIndex).parent().data('key');
+				if(init == true){
+					$input.val(val);
+					$containerDivText.html(text);
+					return false;
+				}
+
+				try{
+					$input.val(val);
+				}catch(ex){
+					$input[0].selectedIndex = currentIndex;
+				}
+
+				$input.change();
+				$containerDivText.html(text);
+			}
+
+			$input.on('change.sSelect', function(event){
+				$targetInput = $(event.target);
+				if(prevented == true){
+					prevented == false;
+					return false;
+				}
+				$currentOpt = $targetInput.find(':selected');
+				currentIndex = $targetInput.find('option').index($currentOpt);
+				navigateList(currentIndex, true);
+
+			});
+
+
+            function keyPress(element){
+				$(element).unbind('keydown.sSelect').bind('keydown.sSelect', function(e){
+					var keycode = e.which;
+					prevented = true;
+					switch(keycode){
+                        case 9 :
+                            $(this).blur();
+                            break;
+						case 40 :
+						case 39 :
+							incrementList();
+							return false;
+							break;
+						case 38 :
+						case 37 :
+							decrementList();
+							return false;
+							break;
+						case 33 :
+						case 36 :
+							gotoFirst();
+							return false;
+							break;
+						case 34 :
+						case 35 :
+							gotoLast();
+							return false;
+							break;
+						case 13 :
+						case 27 :
+							$newUl.hide();
+							$containerDiv.removeClass(opts.containerOnClass);
+							positionHideFix();
+							return false;
+							break;
+					}
+
+					keyPressed = String.fromCharCode(keycode).toLowerCase();
+
+					var currentKeyIndex = keys.indexOf(keyPressed);
+
+					if(typeof currentKeyIndex != 'undefined'){
+						++currentIndex;
+						currentIndex = keys.indexOf(keyPressed, currentIndex);
+						if(currentIndex == -1 || currentIndex == null || prevKey != keyPressed){
+							currentIndex = keys.indexOf(keyPressed);
+						}
+
+						navigateList(currentIndex);
+						prevKey = keyPressed;
+						return false;
+					}
+				});
+			}
+
+			function incrementList(){
+				if(currentIndex < (newLiLength-1)){
+					++currentIndex;
+					navigateList(currentIndex);
+				}
+			}
+
+			function decrementList(){
+				if(currentIndex > 0){
+					--currentIndex;
+					navigateList(currentIndex);
+				}
+			}
+
+			function gotoFirst(){
+				currentIndex = 0;
+				navigateList(currentIndex);
+			}
+
+			function gotoLast(){
+				currentIndex = newLiLength-1;
+				navigateList(currentIndex);
+			}
+
+			$containerDiv.on('click.sSelect', function(e){
+				e.stopPropagation();
+				keyPress(this);
+			});
+
+			$containerDiv.on('focus.sSelect', function(e){
+				$(this).addClass('select-list-focus');
+				keyPress(this);
+			});
+
+			$containerDiv.on('blur.sSelect', function(e){
+				$(this).removeClass('select-list-focus');
+			});
+
+			$(document).on('click.sSelect', function(){
+				$containerDiv.removeClass('select-list-focus');
+				$newUl.hide();
+				$containerDiv.removeClass(opts.containerOnClass);
+				positionHideFix();
+			});
+
+			$containerDivText.on('mouseenter.sSelect', function(e){
+				var $hoveredTxt = $(e.target);
+				$hoveredTxt.parent().addClass('select-list-hover');
+			}).bind('mouseleave.sSelect', function(e){
+				var $hoveredTxt = $(e.target);
+				$hoveredTxt.parent().removeClass('select-list-hover');
+			});
+
+			$newUl.css({
+				left: '0',
+				display : 'none',
+				visibility : 'visible'
+			});
+		});
+	};
+    // select end
+
+    /* ***** layout ***** */
+    front.init();
+
+    var $document = $(document);
+
+    /* gnbMenu */
+    $document.on("mouseenter focusin", ".gnbMenuWrap .mm", function(){
+        if(front.device.isWeb()){
+            $("#header, #header .gnbMenuWrap").addClass("on");
+            $(this).addClass("on").closest(".li").siblings(".li").find(".mm").removeClass("on");
+            front.gnbMenu.open();
+        }
+    });
+
+    $document.on("focusout", "#header .gnbMenuWrap .li:last-child .sLi:last-child", function(e){
+        if(front.device.isWeb()){
+            (front.device.isWeb()) ? front.gnbMenu.close() : '';
+        }
+    });
+
+    $document.on("mouseleave", "#header .gnbMenuWrap", function(){
+        (front.device.isWeb()) ? front.gnbMenu.close() : '';
+    });
+
+    $document.on("mouseover", "#header #dim", function(){
+        (front.device.isWeb()) ? front.gnbMenu.close() : '';
+    });
+
+    $document.on("click", ".allMenuWrap .mm", function(e){
+        if(front.device.isMob()){
+            var _ = $(this);
+            var $siblings = _.closest(".li").siblings(".li");
+
+            if(!_.is(".on")){
+                _.find(".arr .ico").text("닫기");
+                _.addClass("on").next(".sub").slideDown("fast").addClass("on");
+                $siblings.find(".mm").removeClass("on").find(".arr .ic4o").text("열기");
+                $siblings.find(".sub").slideUp("fast").removeClass("on");
+
+            }else{
+                _.find(".arr .ico").text("열기");
+                _.removeClass("on").next(".sub").slideUp("fast").removeClass("on");
+            }
+
+            e.preventDefault();
+        }
+    });
+
+    $document.on("click", ".allMenuWrap .btnNavi.close", function(){
+        if(front.device.isWeb()){
+            front.gnbMenu.close();
+            $(".gnbMenuWrap li:last-child .mm").focus();
+        }else if(front.device.isMob()){
+            front.allMenu.close();
+        }
+    });
+
+    /* mobile */
+    $document.on("click", "#header .btnNavi.menu", function(){
+        front.allMenu.open();
+    });
+
+
+
+	/* ***** common ***** */
+	$document.on("click", "a[href='#'], a[href='#none']", function(e){e.preventDefault();});
+
+    /* quickTop */
+    $(".btn.quickTop").on("click", function(){
+       $(window).scrollTop(0);
+    });
+
+    /* button */
+    $(".btnDef").on("keyup", function(e){
+        if(e.keyCode == 9 && $(this).focus()){
+            $(this).addClass("focus");
+        }
+    }).on("blur",function(){
+        $(this).removeClass("focus");
+    });
+
+
+
+    /* ***** content ***** */
+    /* 투자가이드 : 앵커메뉴 */
+    $(".anchorAct a").on("click", function(){
+        var _ = $(this);
+        var $id = $("#" +_.attr("data-id"));
+        var $top = parseInt($id.offset().top);
+        var $hdH = $("#header").height();
+        var $val = (front.device.isMob) ? $top - $hdH -10 : $top - $hdH - 20;
+
+        $(window).scrollTop($val);
+    });
+
+    /* window scrolling */
+    $(window).on("scroll", function() {
+       front.scroll.active();
+
+       (front.device.isWeb()) ? front.tblFixed.reset() : front.tblFixed.active();
+       (front.device.isMob()) ? front.scrollEvent.active() : front.scrollEvent.reset();
+    });
+
+
+    /* window resize */
+    $(window).on("resize", function() {
+        front.resize();
+
+        if(front.isTblFix == true){
+            (front.device.isMob()) ? front.tblFixed.active() : front.tblFixed.reset();
+        };
+
+        if(front.device.isWeb()) {
+            front.allMenu.init();
+            ($(".layerWrap").length == 0) ? $("#dim").remove() : '';
+        }
+
+        //select active
+        if($(".select-list-box").length == 0) {
+            $(".select").sSelect();
+        };
+
+        (front.isTblGraph) ?  front.tblGraph.mBarWidth() : '';
+
+    }).trigger("resize");
+
+    //state minus del
+    if($(".statePt").length > 0){
+        statePtMinus();
+    }
+
+	//jquery end
+});
+
+
+/* main visual banner */
+function mainVbAni(){
+	var vbSlider = $('.vbSlider');
+	vbSlider.slick({
+		arrows:true,
+		autoplay:true,
+		infinite: true,
+		dots:true,
+		fade: false,
+		slidesToShow: 1,
+	});
+
+	var $autoValue = vbSlider.slick("slickGetOption","autoplay");
+
+	($autoValue == true) ? $('.vbWrap .slick-controls .btn.stop').addClass("on") : $('.vbWrap .slick-controls').remove();
+
+	$('.vbWrap .slick-controls .btn').on("click",function(){
+		var _ = $(this);
+		_.removeClass("on").siblings(".btn").addClass("on").focus();
+		(_.is(".play")) ? vbSlider.slick("slickPlay") : vbSlider.slick("slickPause");
+	});
+
+	$('.vbWrap .slick-dots button').on("click",function(){
+		vbSlider.slick("slickPause");
+		$('.vbWrap .slick-controls .btn.play').addClass("on").siblings(".btn").removeClass("on");
+	});
+}
+
+/* main rolling banner */
+function mainRollAni(){
+    front.main.rollBan(".rollBan1", 4500, 5500);
+    front.main.rollBan(".rollBan2", 3500, 4500);
+}
+
+
+/* state minus del */
+function statePtMinus(){
+    $(".statePt.down").each(function(){
+        var $str = $(this).find("em").text();
+        $str = $str.replace(/\-/g,'');
+        return $(this).find("em").text($str);
+    });
+}
