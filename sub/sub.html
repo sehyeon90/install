@@ -4,17 +4,18 @@
     <meta charset="UTF-8">
     <title>KITIA</title>
     
-    <link rel="stylesheet" href="css/common.css">
-    <link rel="stylesheet" href="css/css.css">
-    <link rel="stylesheet" href="css/animate.css">
-    <link rel="stylesheet" href="css/layout.css">
-    <link rel="stylesheet" href="css/reset.css">
-    <link rel="stylesheet" href="css/slick.css">
-    <link rel="stylesheet" href="css/content.css">
+    <link rel="stylesheet" href="../css/common.css">
     
-    <script type="text/javascript" src="js/jquery-3.5.1.min.js"></script>
-    <script src="js/slick.js"></script>
-    <script type="text/javascript" src="js/analytics.js"></script>
+    <link rel="stylesheet" href="../css/css.css">
+    <link rel="stylesheet" href="../css/animate.css">
+    <link rel="stylesheet" href="../css/layout.css">
+    <link rel="stylesheet" href="../css/reset.css">
+    <link rel="stylesheet" href="../css/slick.css">
+    <link rel="stylesheet" href="../css/content.css">
+    
+    <script type="text/javascript" src="../js/jquery-3.5.1.min.js"></script>
+    <script src="../js/slick.js"></script>
+    <script type="text/javascript" src="../js/analytics.js"></script>
 
     
     <!-- 구글 애널리틱스 -->
@@ -1093,19 +1094,18 @@ function statePtMinus(){
            <div class="inner">
                <div class="row">
                    <div class="col col1">
-                       <h1 class="logo"></h1>
-                           <a href="#" class="ico">kitia</a>
+                       <h1 class="logo">
+                           <a href="../index.html" class="ico">kitia</a>
+                           </h1>
                            <button type="button" class="btnNavi prev">
                                <span class="ico">이전</span>
                            </button>
-                       
-                   </div>
+                    </div>
                    <div id="mTit" class="col col2">
                        <h2 class="mTit">인사말</h2>
                    </div>
                    <div class="col col3">
 <!--                      gnb메뉴-->
-                      
                        <div class="gnbMenuWrap">
                            <ul>
                                <li class="li">
@@ -1115,13 +1115,13 @@ function statePtMinus(){
                                    </a>
                                    <ul class="sub" style="display: block; height: 285px; padding-top: 24px; margin-top:1px; margin-bottom: 0px; overflow: hidden;">
                                        <li class="sLi">
-                                           <a href="#" class="sm">인사말</a>
+                                           <a href="../sub/sub.html" class="sm">인사말</a>
                                        </li>
                                        <li class="sLi">
-                                           <a href="#" class="sm">협의회소개</a>
+                                           <a href="../sub/sub2.html" class="sm">협의회소개</a>
                                        </li>
                                        <li class="sLi">
-                                           <a href="#" class="sm">연혁</a>
+                                           <a href="../sub/sub3.html" class="sm">연혁</a>
                                        </li>
                                        <li class="sLi">
                                            <a href="#" class="sm">찾아오시는길</a>
@@ -1217,7 +1217,43 @@ function statePtMinus(){
         <h2 id="bTit" class="blind"></h2>
 <!--        //localwrap-->
 <!--       content-->
-    <div class="content"></div>
+    <div class="content">
+        <div class="title_box container">
+            <h2>인사말</h2>
+            <h3>President's Message</h3>
+        </div>
+<!--        <h3 class="hTit1">인사말</h3>-->
+        <section id="content">
+<!--            컨텐츠 내용-->
+           <article id="subCon">
+               <dl class="ceo-container">
+                   <dt>
+                       <h3>
+                           <b>안녕하십니까?</b>
+                           <span>KITIA 홈페이지</span>
+                           를 방문해주셔서 감사합니다.
+                                                   
+                       </h3>
+                       <p>
+                           "한국소재부품장비투자기관협의회 회장"
+                           <span>박기호</span>
+                           "입니다."
+                       </p>
+                       <img src="../img/ceoimg.png" alt="인사말이미지">
+                   </dt>
+                   <dd>
+                       <p>"소재부품장비분야 기술력은 국가와 기업 경쟁력의 기초입니다."</p>
+                       <p>미중 무역갈등, 일본 수출규제와 더불어, 코로나 19가 촉발한 주요 국가 및 기업들의 Re-shoring 충격은 소재부품장비의 중요성을 피부로 느낄 수 있는 중요한 계기였습니다.</p>
+                       <p>저희 한국소재부품장비투자기관협의회(KITIA)는 지난 20년간 정부의 기술개발(R&D)과 민간투자기관들의 투자를 연결하며, 우리 소재부품장비 기업들의 기술개발 및 사업화를 주도하는 “투자중심”으로서 역할을 수행해왔습니다.</p>
+                       <p>저희 협의회를 통해 적재적소에 연결된 투자금은 우리 소재부품장비 기업들이 신속하게 고부가/핵심 기술을 확보하고, 글로벌 기업으로 성장하는데 기여했습니다.</p>
+                       <p>앞으로도 협의회는 정부의 적극적인 소재부품장비 기업육성정책과 170여개 민간투자기관 회원사들의 적극적인 참여를 동시에 이끌어냄으로써 우리 소재부품장비 산업의 성장과 발전을 주도하고, 나아가 산업 전체의 투자 활성화와 경쟁력 강화에 기여할 수 있도록 최선의 노력을 다하겠습니다. 감사합니다.</p>
+                   </dd>
+               </dl>
+
+           </article>
+        </section>
+            
+    </div>
 <!--     //content-->
         
     </div>
@@ -1262,12 +1298,13 @@ function statePtMinus(){
         <div id="toolOpen" class="layerHtml"></div>
         <div id="FO10240_infoOpen" class="layerHtml"></div>
    </div> 
+<!--mobileMenu   -->
 <!--   모바일영역 -->
     <div class="allMenuWrap open">
         <div class="allIn" tabindex="0">
             <h2 class="blind">전체메뉴</h2>
             <div class="allHd">
-                <button type="button" class="btnNavi home">
+                <button type="button" class="btnNavi home" onclick="">
                     <span class="blind">KITIA</span>
                 </button>
             </div>
@@ -1363,6 +1400,7 @@ function statePtMinus(){
                 </ul>
                 
             </div>
+<!--            //gnb 메뉴-->
             <button type="button" class="btnNavi close">
                 <span class="ico">전체메뉴닫기</span>
             </button>

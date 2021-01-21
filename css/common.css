@@ -1003,10 +1003,10 @@ p.cTxtBox{color:#235fb0; font-weight:bold; text-align: center;}
 
 
     /* ** button ** */
-    .btnNavi.prev .ico{width:54px; height: 49px; background: url("../img/") no-repeat center left; background-size: 50px;}
-    .btnNavi.menu .ico{width:54px; height: 49px; background: url("../img/ham.png") no-repeat center right; background-size: 50px;}
+    .btnNavi.prev .ico{width:40px; height: 40px; background: url("../img/btn_prevpage.png") no-repeat center left; background-size: 30px;}
+    .btnNavi.menu .ico{width:45px; height: 50px; background: url("../img/ham.png") no-repeat center right; background-size: 30px;}
 
-    .main .btnNavi.menu .ico{background: url("../img/m_ico_btnNavi_menu2.png") no-repeat center right; background-size: 50px;}
+    .main .btnNavi.menu .ico{background: url("../img/m_ico_btnNavi_menu2.png") no-repeat center right; background-size: 26px; margin-right: 10px;}
     .main.fixed .btnNavi.menu .ico{background: url("../img/mob/m_ico_btnNavi_menu.png") no-repeat; background-size: 50px;}
 
     .btnDef{font-size: 1.3rem; height:35px; padding-left:5px; padding-right:5px;}
